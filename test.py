@@ -1,3 +1,4 @@
-from igs_funcs import *
+# from igs_funcs import *
+from new_project import *
 
-Generate_Update_Logs()
+create_new_project()
