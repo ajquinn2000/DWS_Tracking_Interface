@@ -2,16 +2,20 @@ import os
 
 from shutil import copyfile
 from openpyxl import load_workbook
+from general_funcs import *
 
 
 def create_new_project():
-    up_dir_num = 2
+    # make sure that it is in the proper master directory
+    gotoTracking()
+    # getting variables
+    file_loc_var = getVar('Python_Source\\!variables\\file_locations.txt')
 
-    # changing working directory to work within the tracking folder
-    for i in range(0, up_dir_num):
-        path_parent = os.path.dirname(os.getcwd())
-        os.chdir(path_parent)
-    print("Changed Directory to -->" + str(os.getcwd()))
+    print(file_loc_var)
+
+
+    pass
+
 
     # xlsx templates to copy
     xlsx_template_loc = r'Projects\Template\Template.xlsx'
