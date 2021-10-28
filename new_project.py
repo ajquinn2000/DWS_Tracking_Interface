@@ -2,34 +2,95 @@ import os
 
 from shutil import copyfile
 from openpyxl import load_workbook
+from tkinter import messagebox
+from datetime import datetime
+
 from general_funcs import *
+
 
 
 def create_new_project():
     # make sure that it is in the proper master directory
     gotoTracking()
     # getting variables
-    file_loc_var = getVar('Python_Source\\!variables\\file_locations.txt')
+    file_loc_var = getVar('Python_Source\\!variables\\new_project_var.txt', False)
+    d2_loc = getVar('Python_Source\\!variables\\Quality_Control_Files\\QC-D2-Locations.txt', False)
+
+    tracking_stats_loc = 'Python_source\\!working_files\\dws_tracking_vars.txt'
+    tracking_stats_all = getVar(tracking_stats_loc, True)
+    tracking_comment_line = tracking_stats_all[0]
+    tracking_stats = tracking_stats_all[1]
+    tracking_alllines = tracking_stats_all[2]
 
     print(file_loc_var)
-
-
-    pass
-
+    print(tracking_stats)
 
     # xlsx templates to copy
-    xlsx_template_loc = r'Projects\Template\Template.xlsx'
-    packingslip_template_loc = r'Projects\Template\_PACKING_SLIP.xlsx'
+    # Python_Source\!working_files\Template.xlsx
+    xlsx_template_loc = file_loc_var[0]
+    # Quality_Control\\!D - Documents\\D2 - Documentation\\D2-7.0 - Packing Slip.xlsx
+    packingslip_template_loc = d2_loc[6]
 
-    # getting project number
-    project = input("What is the new Project Number, dawg?: ")
+
+    # getting amount of previously created projects
+    projects_t_date = tracking_stats[0]
+
+    # getting the month of the previous project creation to automatically start the count from 0 in the next year
+    prev_proj_mont = tracking_stats[1]
+
+    # getting date info
+    now_is_time = datetime.now()
+    date_string = now_is_time.strftime('%m%y')
+    month_int = now_is_time.strftime('%m')
+    print(f'Month: {month_int}')
+    if month_int == '01' and prev_proj_mont == '12':
+        projects_t_date = '01'
+
+    new_project_num = date_string + projects_t_date
+
+    title = f'New Project w/{new_project_num}?'
+    message = f'Do you want "{new_project_num}" to be the Project Number?\n\n' \
+              f'Press "Yes" to Continue\n' \
+              f'Press "No" to Enter Different Number\n' \
+              f'Press "Cancel" to cancel'
+
+    yes = messagebox.askyesnocancel(title=title, message=message)
+
+    # print(f'Yes: {yes}')
+
+    if yes is None:
+        return
+
+    else:
+        with open(tracking_stats_loc, 'w') as file:
+            new_num = int(projects_t_date) + 1
+            tracking_alllines[0+int(tracking_comment_line)] = f'0Projects Created This Year: {new_num:02d}\n'
+            tracking_alllines[1+int(tracking_comment_line)] = f'1Month of Last Create Project: {month_int}\n'
+            file.writelines(tracking_alllines)
+        if yes:
+            project = new_project_num
+        elif not yes:
+            # could add "put your own number in" func with it checking all current projects to make sure no dupe
+            pass
+
+
+
 
     # project folder locations
-    folder_path = r'Projects\\' + project
-    project_pathxlsx = folder_path + r'\\' + project + '.xlsx'
-    packingslip_pathxlsx = folder_path + r'\\' + project + '_PACKING_SLIP.xlsx'
-    src_folder = folder_path + '\\src'
-    purchase_folder = folder_path + '\\Purchase_Scans'
+    folder_path = f'Projects\\{project}'
+    project_pathxlsx = f'{folder_path}\\{project}.xlsx'
+    packingslip_pathxlsx = f'{folder_path}\\{project}.xlsx'
+    src_folder = f'{folder_path}\\!src'
+    purchase_folder = f'{folder_path}\\Purchase_Scans'
+    certs_folder = f'{folder_path}\\Material_Cert_Scans'
+    general_scans = f'{folder_path}\\General_Scans'
+
+    if path.isdir(folder_path):
+        warning_message = f'Error Creating Project: {project}\n' \
+                          f'Project {folder_path} already exists\n' \
+                          f'Try again, dumbo...smh'
+        messagebox.showwarning(title='Cannot Create Project', message=warning_message)
+        return
 
     # making new project folder
     os.mkdir(folder_path)
@@ -68,17 +129,23 @@ def create_new_project():
 
     # copying the file
     copyfile(packingslip_template_loc, packingslip_pathxlsx)
-    print("Made {}_PACKING_SLIP".format(project))
+    print(f"Made {project}_PACKING_SLIP")
 
     # making source file
     os.mkdir(src_folder)
-    print("Made {} src Folder".format(project))
+    print(f"Made {project} src Folder")
 
-    # making Invoce scan folder
+    # making general/other scan folder
+    os.mkdir(general_scans)
+    print(f"Made {project} General_Scans Folder")
+
+    # making purchase scan folder
     os.mkdir(purchase_folder)
-    print("Made {} Purchase_Scans Folder".format(project))
+    print(f"Made {project} Purchase_Scans Folder")
 
-    input("All finished my dude.\nHope I did my job well.\nPress Enter to continue...")
+    # making cert scan folder
+    os.mkdir(certs_folder)
+    print(f"Made {project} Material_Cert_Scans Folder")
 
 
 
