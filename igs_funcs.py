@@ -12,13 +12,15 @@ from shutil import copyfile
 
 class IGS_Generate_Update_Logs:
     """Handles logging file management and Packing Slip creation"""
-    def __init__(self, inv_loc, proj, itms: list, qtys: list):
+    def __init__(self, proj, shipping_loc, qtys: list, itms: list):
         super().__init__()
+        gotoTracking()
         self.igs_vars = getVar('Python_Source\!variables\igs_tracking_var.txt', False)
         self.excel_back_up = self.igs_vars[0]
+        self.inventory_loc = self.igs_vars[2]
 
         # location of IGS inventory tracking
-        self.inventory_loc = inv_loc
+        self.shipping_loca = shipping_loc
         # project number that it is for
         self.project = proj
         # indexes of the items chosen
@@ -41,7 +43,7 @@ class IGS_Generate_Update_Logs:
     def CheckandUpdate(self):
         """Will check IGS and DWS inventories to make sure what action to take and if it is alright."""
 
-        if path.exists('Customers\IGS\Inventory\~$IGS_Inventory_Tracking.xlsx'):
+        if path.exists('Customers\\IGS\\Inventory\\~$IGS_Inventory_Tracking.xlsx'):
             messagebox.showwarning(
                 title='Please Close File',
                 message='Please close the IGS_Inventory_Tracking.xlsx file before continuing.'
@@ -146,26 +148,39 @@ class IGS_Generate_Update_Logs:
 
         new_backup_loc = f'{self.excel_back_up}\\{date_slip}-BeforeProject_{self.project}.xlsx'
 
+        # making backup before making changed
         copyfile(self.inventory_loc, new_backup_loc)
 
+        # inputting new part changes
         with ExcelWriter(self.inventory_loc, mode='w') as writer:
             import_df.to_excel(writer, sheet_name='IGS_DWS_INVENTORY', index=False)
 
+        # getting list of backups in the backup folder
         # 'Customers\IGS\Inventory\Backups'
         file_lst = listdir(path=self.excel_back_up)
+        # getting rid of the log folder
         file_lst.pop(file_lst.index('LOG'))
 
+        # creating list of the backups to check for the oldest out of 11 and deleting the oldest to get 10
         full_path = [self.excel_back_up + '\\' + str(x) for x in file_lst]
 
-
+        # checking the length for more than 10 and deleting it
         if len(file_lst) > int(self.igs_vars[1]):
             oldest = min(full_path, key=path.getctime)
             remove(oldest)
 
 
-
     def Generate_Packing_Slip(self):
-        pass
+        packing_slip_loc = f'Projects\\{self.project}\\D2-7.0-{self.project} - Packing Slip.xlsx'
+
+        AddDataToExcel(
+            excel_loc=packing_slip_loc,
+            sheet_name='INPUT',
+            col_loc=[2, 3, 4],
+            row_list_data=[self.shipping_loca, self.quantitties, self.items],
+            place_loc=(0, 0),
+            scan_max=(20, 5)
+        )
 
 
 def LoadData(inventory_loc):

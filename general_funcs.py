@@ -1,5 +1,11 @@
 from os import path, getcwd, chdir
 
+from appending_funcs import append_df_to_excel
+from operator import itemgetter
+
+import pandas as pd
+
+
 
 def getVar(var_file_loc: str, edit_q):
     working_output = []
@@ -51,3 +57,39 @@ def gotoTracking():
               f'{current_dir}')
         return
 
+
+def AddDataToExcel(
+        excel_loc: str,
+        sheet_name: str,
+        col_loc: list,
+        row_list_data: list,
+        place_loc: tuple,
+        scan_max: tuple
+):
+
+    gotoTracking()
+    # reads the info from the excel to get the column names
+    df = pd.read_excel(excel_loc, sheet_name=sheet_name)
+
+    column_list = df.columns.tolist()
+    print(f'Columns extracted: \n{column_list}')
+    col_name_loc = [column_list[i] for i in col_loc]
+
+    for column_name, row_list in zip(col_name_loc, row_list_data):
+        if type(row_list) != list:
+            df.loc[0, column_name] = row_list
+        else:
+            for i, row in enumerate(row_list):
+                df.loc[i, column_name] = row
+
+    append_df_to_excel(
+        excel_loc,
+        df=df,
+        sheet_name=sheet_name,
+        index=False,
+        startrow=place_loc[0],
+        startcol=place_loc[1],
+        max_row=scan_max[0],
+        max_col=scan_max[1]
+    )
+    print(f'Sending to: {excel_loc}\n{df}')

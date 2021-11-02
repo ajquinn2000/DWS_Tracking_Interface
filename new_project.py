@@ -5,6 +5,8 @@ from openpyxl import load_workbook
 from tkinter import messagebox
 from datetime import datetime
 
+from pandas import ExcelWriter, DataFrame
+
 from general_funcs import *
 
 
@@ -16,11 +18,11 @@ def create_new_project():
     file_loc_var = getVar('Python_Source\\!variables\\new_project_var.txt', False)
     d2_loc = getVar('Python_Source\\!variables\\Quality_Control_Files\\QC-D2-Locations.txt', False)
 
-    tracking_stats_loc = 'Python_source\\!working_files\\dws_tracking_vars.txt'
+    tracking_stats_loc = 'Python_source\\!working_files\\dws_tracking_vals.txt'
     tracking_stats_all = getVar(tracking_stats_loc, True)
     tracking_comment_line = tracking_stats_all[0]
     tracking_stats = tracking_stats_all[1]
-    tracking_alllines = tracking_stats_all[2]
+    tracking_alllines = tracking_stats_all[-1]
 
     print(file_loc_var)
     print(tracking_stats)
@@ -28,6 +30,7 @@ def create_new_project():
     # xlsx templates to copy
     # Python_Source\!working_files\Template.xlsx
     xlsx_template_loc = file_loc_var[0]
+    text_stats_temp_loc = file_loc_var[1]
     # Quality_Control\\!D - Documents\\D2 - Documentation\\D2-7.0 - Packing Slip.xlsx
     packingslip_template_loc = d2_loc[6]
 
@@ -62,8 +65,8 @@ def create_new_project():
         return
 
     else:
+        new_num = int(projects_t_date) + 1
         with open(tracking_stats_loc, 'w') as file:
-            new_num = int(projects_t_date) + 1
             tracking_alllines[0+int(tracking_comment_line)] = f'0Projects Created This Year: {new_num:02d}\n'
             tracking_alllines[1+int(tracking_comment_line)] = f'1Month of Last Create Project: {month_int}\n'
             file.writelines(tracking_alllines)
@@ -71,15 +74,15 @@ def create_new_project():
             project = new_project_num
         elif not yes:
             # could add "put your own number in" func with it checking all current projects to make sure no dupe
-            pass
+            return
 
 
 
 
     # project folder locations
     folder_path = f'Projects\\{project}'
-    project_pathxlsx = f'{folder_path}\\{project}.xlsx'
-    packingslip_pathxlsx = f'{folder_path}\\{project}.xlsx'
+    project_pathxlsx = f'{folder_path}\\{project}-master.xlsx'
+    packingslip_pathxlsx = f'{folder_path}\\D2-7.0-{project} - Packing Slip.xlsx'
     src_folder = f'{folder_path}\\!src'
     purchase_folder = f'{folder_path}\\Purchase_Scans'
     certs_folder = f'{folder_path}\\Material_Cert_Scans'
@@ -129,11 +132,24 @@ def create_new_project():
 
     # copying the file
     copyfile(packingslip_template_loc, packingslip_pathxlsx)
-    print(f"Made {project}_PACKING_SLIP")
+    print(f"Made {project} Packing Slip Folder")
+    AddDataToExcel(
+        excel_loc=packingslip_pathxlsx,
+        sheet_name='INPUT',
+        col_loc=[1],
+        row_list_data=[str(project)],
+        place_loc=(0, 0),
+        scan_max=(2, 2)
+    )
 
     # making source file
     os.mkdir(src_folder)
     print(f"Made {project} src Folder")
+
+    # making the project stats file to check if packing slips or certain purchases have been made
+    stats_text_loc = f'{src_folder}\\stats.txt'
+    copyfile(text_stats_temp_loc, stats_text_loc)
+    print(f"Made {project} Stats File")
 
     # making general/other scan folder
     os.mkdir(general_scans)

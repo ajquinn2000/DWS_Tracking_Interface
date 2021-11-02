@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-from dans_solvers import cosLaw
+# from dans_solvers import cosLaw
 # import os
 # os.chdir(os.path.dirname(os.getcwd()))
 
@@ -12,6 +12,7 @@ class App1(ttk.Frame):
         ttk.Frame.__init__(self, master)
         self.grid()
         self.createWidgets()
+        self.winfo_geometry()
 
     def chosened(self):
         l_a_q = self.selected.get()
@@ -58,7 +59,7 @@ class App1(ttk.Frame):
 
         print(self.selected.get())
 
-        ans = cosLaw(self.selected.get(), a, b, c)
+        # ans = cosLaw(self.selected.get(), a, b, c)
 
         messagebox.showinfo(title="THIS IS THE ANSWER I CAME UP WITH!!! <3", message=str(ans))
 
