@@ -1,10 +1,11 @@
 from general_funcs import *
 
 from tkinter import messagebox
-from os import listdir, remove, path
+from os import listdir, remove, path, mkdir
 from pandas import read_excel, DataFrame, ExcelWriter
 from datetime import datetime
 from shutil import copyfile
+from csv import writer
 
 
 # random edit
@@ -14,8 +15,10 @@ class IGS_Generate_Update_Logs:
     """Handles logging file management and Packing Slip creation"""
     def __init__(self, proj, shipping_loc, qtys: list, itms: list):
         super().__init__()
-        gotoTracking()
-        self.igs_vars = getVar('Python_Source\!variables\igs_tracking_var.txt', False)
+        current_dir = getcwd().split('\\', -1)[-1]
+        if current_dir != 'TRACKING':
+            GoToTracking()
+        self.igs_vars = GetVar('Python_Source\!variables\igs_tracking_var.txt', False)
         self.excel_back_up = self.igs_vars[0]
         self.inventory_loc = self.igs_vars[2]
 
@@ -50,6 +53,8 @@ class IGS_Generate_Update_Logs:
             )
             return
 
+        comment_lst = []
+
         # cycling through the indexes of items chosen to get condition
         for i, given_chosen_index in enumerate(self.indexes):
             # getting a given line's quntities: amount asked, amount igs has amount dws has
@@ -65,6 +70,8 @@ class IGS_Generate_Update_Logs:
                 self.igs_inv[given_chosen_index] = changed_amnts[0]
                 self.dws_inv[given_chosen_index] = changed_amnts[1]
 
+                comment_lst.append(checked_message)
+
             if not approved:
                 messagebox.showinfo(title='', message='No information has been changed or edited\n'
                                                       'Press "Okay" to continue')
@@ -73,6 +80,7 @@ class IGS_Generate_Update_Logs:
 
         self.Update_Excel_Backup()
 
+        self.UpdateLogs(comment_lst)
 
         self.Generate_Packing_Slip()
 
@@ -169,6 +177,37 @@ class IGS_Generate_Update_Logs:
             oldest = min(full_path, key=path.getctime)
             remove(oldest)
 
+
+    def UpdateLogs(self, comment_list):
+        log_folder = f'{self.excel_back_up}\\LOG'
+        now = datetime.now()
+        date_time = now.strftime('%m/%d/%Y - %H:%M:%S')
+        year = now.year
+        month = now.strftime('%B')
+
+        date_dir = f'{log_folder}\\{year}'
+
+        if not path.isdir(date_dir):
+            print(f'Made {year} log folder')
+            mkdir(date_dir)
+
+        month_csv_path = f'{date_dir}\\{month}.csv'
+        if not path.isfile(month_csv_path):
+            a = True
+        else:
+            a = False
+
+        with open(month_csv_path, 'a+', newline='') as write_obj:
+            csv_writer = writer(write_obj)
+
+            if a:
+                first_line = ['Comment', 'Date\\Time']
+                csv_writer.writerow(first_line)
+
+            for row in comment_list:
+                output_row = [row, date_time]
+
+                csv_writer.writerow(output_row)
 
     def Generate_Packing_Slip(self):
         packing_slip_loc = f'Projects\\{self.project}\\D2-7.0-{self.project} - Packing Slip.xlsx'
