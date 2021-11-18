@@ -1,0 +1,11 @@
+Comment Lines: 8
+
+0 = Payment Methods: 
+	When you add a new payment method, seperate it with a comma and no space (Example Below)
+		NET 30,XXXX,YYYY,ZZZZ
+1 = Purchase Order Location
+
+----------
+0Payment Methods: NET 30,0525,9233,7884
+1Full Purchase Order: Quality_Control\!D - Documents\D2 - Documentation\D2-4.0 - Purchase Order.xlsx
+2Short PO: D2-4.0 - Purchase Order

@@ -17,6 +17,7 @@ from nb_project_browser import ProjectBrowser, OpenProject, GetDocList, CreateDo
 # add tab for worker hours input
 # make igs log change xlsx from year to year
 # add packing slip stat
+# add in code to handle the new year Shop file creation, New all year IGS projects
 
 
 

@@ -13,7 +13,7 @@ def GetVar(var_file_loc: str, edit_q):
     # getting opening and reading the file
     with open(var_file_loc, 'r') as write:
         vars_ = write.readlines()
-        print(vars_)
+        # print(vars_)
     # getting the amount of lines to skip
     # getting the 0th (first) line . getting rid of \n . splitting the number in two at the ': '
     split_amnt = vars_[0].rstrip().split(': ')
@@ -50,8 +50,8 @@ def GoToTracking():
     current_dir = getcwd().split('\\', -1)[-1]
     print(f'Current Directory: {current_dir}')
     if 'TRACKING' == current_dir:
-        print(f'In Master Directory: {getcwd()}\n'
-              f'        (Should be TRACKING)')
+        # print(f'In Master Directory: {getcwd()}\n'
+        #       f'        (Should be TRACKING)')
         return
     elif current_dir != 'TRACKING':
         # changing working directory to work within the tracking folder
@@ -143,14 +143,14 @@ def IncrementGivenStat(
         new_inc = increment
         # combining the newly incremented stat back into var list
         # so that it can be saved to the text file
-        print(f'Befor\n{var_vars}')
+        # print(f'Befor\n{var_vars}')
         last_in_lst = var_vars[-1]
-        print(f'lBefor {last_in_lst}')
+        # print(f'lBefor {last_in_lst}')
         if not '\n' in last_in_lst:
             var_vars[-1] = f'{var_vars[-1]}\n'
-            print(f'afta {last_in_lst}')
+            # print(f'afta {last_in_lst}')
         var_vars.append(f'{stat_str}: {increment}\n')
-        print(f'After\n{var_vars}')
+        # print(f'After\n{var_vars}')
 
     with open(stat_file, 'w') as file:
         file.writelines(var_vars)

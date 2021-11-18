@@ -1,0 +1,8 @@
+Comment Lines: 6
+
+0 = Project Excel Template
+1 = The text file that will hold the stats for how many purchase order, packing slips, etc.
+
+----------
+0Excel Project Template: Python_Source\!working_files\New_Project_Templates\Template.xlsx
+1Stats Template: Python_Source\!working_files\New_Project_Templates\StatsTemplate.txt

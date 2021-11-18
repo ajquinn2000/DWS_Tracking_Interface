@@ -1,0 +1,16 @@
+Comment Lines: 11
+	The line above is to declare how many lines are for
+comments within this text file.
+
+0 = working_files
+1 = Source Folder
+2 = All Projects Folder
+3 = Vendor Excel
+4 = Logo
+
+----------
+0Working Files: Python_Source\!working_files
+1Source Folder: src
+2Projects Folder: Projects\
+3Vendor Excel: Vendors\Customer_Vendor_Info.xlsx
+4DWS Logo: DWS_Logo.png

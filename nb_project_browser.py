@@ -5,7 +5,8 @@ from os import startfile, listdir, path
 from shutil import copyfile
 from time import sleep
 
-from nb_packing_slip import PackingSlipPage, IGS_Generate_Update_Logs, ALine
+from nb_purchase_input import PurchaseInputPage
+from nb_packing_slip import PackingSlipPage
 from general_funcs import AddDataToExcel
 from new_project import CreateNewProject
 
@@ -36,7 +37,8 @@ def OpenProject(project=None):
         # skipping junk below since the innter funtion wasn't called
         return
 
-    question_label = Label(open_proj, text='Enter Project number below')
+    question_label = Label(open_proj, text="Enter Project number below\n"
+                                           "Press Open to open Projects folder")
 
     confirm_butt = Button(open_proj, text='Open', command=openOpenProject)
     open_proj.bind('<Return>', openOpenProject)
@@ -79,6 +81,17 @@ def CreateProjectDocument(project, doc):
             test_frame.grid()
             temp_slip = PackingSlipPage(master=test_frame, from_project=project, top_level=temp_ps_tk)
             temp_slip.grid()
+
+
+        if doc == 'D2-4.0 - Purchase Order':
+            temp_po_tk = Toplevel()
+            temp_po_tk.title('po_pop_up')
+            test_frame = Frame(temp_po_tk)
+            test_frame.grid()
+            temp_slip = PurchaseInputPage(master=test_frame, from_project=project, top_level=temp_po_tk)
+            temp_slip.grid()
+
+
 
 
 

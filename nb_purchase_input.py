@@ -3,13 +3,12 @@ from tkinter.ttk import Frame, Radiobutton, Label, Entry, Button, LabelFrame, Co
 
 from datetime import datetime
 from shutil import copyfile
-from os import path, mkdir
+from os import path, mkdir, remove
 from csv import writer
 from pandas import read_csv
 
 from appending_funcs import append_df_to_excel
 from general_funcs import GetVar, AddDataToExcel, IncrementGivenStat, LoadVendors
-from nb_project_browser import CreateProjectDocument
 from new_project import CreateNewProject
 
 
@@ -18,6 +17,7 @@ class PurchaseInputPage(Frame):
     def __init__(self, master=None, from_project=False, top_level=None):
         Frame.__init__(self, master)
         self.grid()
+        self.top_level = top_level
 
         purchase_order_vars = GetVar('Python_Source\\!variables\\purchase_input_var.txt', False)
         self.payment_options = purchase_order_vars[0].split(',')
@@ -459,7 +459,16 @@ class PurchaseInputPage(Frame):
 
         purchase_order_dest_loc = f'{purchase_order_folder}\\{dws_tot_count}{self.file_preview_var.get()}'
 
-        copyfile(self.purchase_order_loc, purchase_order_dest_loc)
+        # special doc creation
+        special_path = f"TRACKING\\Projects\\{other_shtuff_lst[3]}\\D2-4.0-{other_shtuff_lst[3]} - Purchase Order.xlsx"
+
+        print(f'____________________ FILE {path.isfile(special_path)}\n{special_path}')
+
+        if path.isfile(special_path):
+            copyfile(special_path, purchase_order_dest_loc)
+            remove(special_path)
+        else:
+            copyfile(self.purchase_order_loc, purchase_order_dest_loc)
 
         AddDataToExcel(
             excel_loc=purchase_order_dest_loc,
@@ -511,6 +520,10 @@ class PurchaseInputPage(Frame):
         self.vendor_loc_var.set('')
         self.file_preview_var.set('D2-4.0-XXXXX-XXXXX-XXXXX - Purchase Order.xlsx')
 
+        if self.top_level != None:
+            self.destroy()
+            self.top_level.destroy()
+
 
 
     def IsEmpty(self, item_quant_amnt_lst, other_shtuff_lst):
@@ -533,24 +546,36 @@ class PurchaseInputPage(Frame):
             for j, element in enumerate(item_quant_amnt):
 
                 if element == '':
-                    messagebox.showwarning(title=f'Nuh uh, my dude:Empty {list_1_str_stuffs[i]}',
+                    messagebox.showwarning(title=f'Nuh uh, my dude: Empty {list_1_str_stuffs[i]}',
                                            message=f'Missing {list_1_str_stuffs[i]} in line {j + 1}, my man\n\ntsk tsk')
                     return True
 
-                if not element.isdigit() and i != 0:
+                blah = element.replace('.', '', 1)
+                # print(f'_________________________{blah}')
+                if not blah.isdigit() and i == 2:
+                    messagebox.showwarning(title='My hommie... Incorrect Amount',
+                                           message=f'Must be a number on line {j + 1} Amount\n'
+                                                   f'Do you know what a number is???')
+                    return True
+
+                if not element.isdigit() and i == 1:
                     messagebox.showwarning(title='My hommie... Incorrect Quantitty',
-                                           message=f'Must be a number on line {j + 1}\n you know what a number is???')
+                                           message=f'Must be a number on line {j + 1} Quantitty\n'
+                                                   f'Do you know what a number is???')
                     return True
 
         for i, input_info in enumerate(other_shtuff_lst):
             if input_info == '' and i < 7:
                 messagebox.showwarning(title=f'My dude...tsk tsk tsk:Empty {list_2_str_stuffs[i]}',
-                                       message=f'Missing {list_2_str_stuffs[i]}\nCome on bruh\nGet it together')
+                                       message=f'Missing {list_2_str_stuffs[i]}\n'
+                                               f'Come on bruh\n'
+                                               f'Get it together')
                 return True
 
             elif input_info == '':
                 skip_q = messagebox.askokcancel(title=f'Possibly Okay:Empty {list_2_str_stuffs[i]}',
-                                       message=f'Missing {list_2_str_stuffs[i]}\nShould that be missing dudette??')
+                                       message=f'Missing {list_2_str_stuffs[i]}\n'
+                                               f'Should that be missing dudette??')
                 if skip_q != True:
                     return True
 
@@ -576,6 +601,7 @@ class PurchaseInputPage(Frame):
     def IncreasePurchaseCount(self):
         proj_stats_loc = f'Projects\\{self.proj_var.get()}\\!src\\stats.txt'
         if not path.isdir(f'Projects\\{self.proj_var.get()}\\!src'):
+            print(f'Sorry bruv, could not find: Projects\\{self.proj_var.get()}\\!src')
             proj_stats_loc = f'Projects\\{self.proj_var.get()}\\src\\stats.txt'
 
         proj_stats = GetVar(proj_stats_loc, True)
@@ -595,7 +621,7 @@ class PurchaseInputPage(Frame):
 
         dws_stats_loc = f'Shop\\{year}'
         shop_stat_loc = f'\\!src\\stats.txt'
-        if not path.isdir(f'\\!src\\stats.txt'):
+        if not path.isdir(f'Shop\\{year}\\!src'):
             shop_stat_loc = f'\\src\\stats.txt'
 
         if not path.isdir(dws_stats_loc):
@@ -621,7 +647,7 @@ class PurchaseInputPage(Frame):
         project = other_shtuff_lst[3]
 
         project_purchase_csv = f'Projects\\{project}\\!src\\{project}p.csv'
-        if not path.isdir(f'Projects\\{project}\\!src\\{project}p.csv'):
+        if not path.isdir(f'Projects\\{project}\\!src'):
             project_purchase_csv = f'Projects\\{project}\\src\\{project}p.csv'
 
         project_log_csv = f'Projects\\{project}\\!src\\{project}p_log.csv'

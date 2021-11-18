@@ -1,0 +1,18 @@
+Comment Lines: 11
+	The line above is to declare how many lines are for
+comments within this text file.
+
+0 = working_files
+1 = Source Folder
+2 = All Projects Folder
+3 = Vendor Excel
+4 = Logo
+
+----------
+0Quote Template: Empty
+1Sales Confirmation: Empty
+2Inspection Test Plan: Empty
+3Purchase Order: Empty
+4Credit Card Approval: Empty
+5Bill of Lading: Empty
+6Packing Slip: Quality_Control\\!D - Documents\\D2 - Documentation\\D2-7.0 - Packing Slip.xlsx

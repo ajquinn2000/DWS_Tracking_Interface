@@ -1,0 +1,10 @@
+Comment Lines: 7
+
+0 = Place where all of the backups will go
+1 = How many back ups will it keep before it starts deleting them
+2 = The dynamic excel that will actively keep track of the the items put into approved packing slips
+
+----------
+0IGS Tracking Backups: Customers\\IGS\\Inventory\\Backups
+1Amount of IGS Backups: 5
+2Main Tracking Excel: Customers\\IGS\\Inventory\\IGS_Inventory_Tracking.xlsx
