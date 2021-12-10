@@ -11,6 +11,8 @@ from appending_funcs import append_df_to_excel
 from general_funcs import GetVar, AddDataToExcel, IncrementGivenStat, LoadVendors
 from new_project import CreateNewProject
 
+global vendor_list
+
 
 class PurchaseInputPage(Frame):
 
@@ -83,9 +85,26 @@ class PurchaseInputPage(Frame):
         )
         self.vendor_frame.grid(row=4, column=0, rowspan=2, sticky=W+E)
 
+        short_name_lframe = LabelFrame(
+            self.vendor_frame,
+            text='Short Vendor Name',
+            padding=self.parent_flabel_pad
+        )
+        short_name_lframe.grid(row=3, column=1)
+
+        self.short_name_entry = Entry(short_name_lframe, textvariable=self.shrt_vendor_var, width=self.entry_width)
+        self.short_name_entry.grid()
+        self.short_name_entry.bind("<Key>", lambda key: self.UpdateFNsd(key))
+
+
+
         self.vendor_list, self.short_vendor, self.vendor_contact, self.vendor_mail, self.vendor_num, self.vendor_location = \
             self.GetVendorInfor()
         print(f'vendor_loc{self.vendor_location}')
+
+        add_sub_file_prev_frame = Frame(self)
+        add_sub_file_prev_frame.grid(row=0, column=1, sticky=N+W+S)
+
 
         # Input frame for inputting shid
         self.input_frame = LabelFrame(
@@ -93,25 +112,25 @@ class PurchaseInputPage(Frame):
             text='Items Purchasing',
             padding=self.parent_flabel_pad
         )
-        self.input_frame.grid(row=1, column=1, rowspan=5, columnspan=2, sticky=N+S)
+        self.input_frame.grid(row=1, column=1, rowspan=5, columnspan=2, sticky=N+W+E+S)
 
         # add/sub line -----
         self.add_sub_line_frame = LabelFrame(
-            self,
+            add_sub_file_prev_frame,
             text='Add/Sub Line',
             padding=self.parent_flabel_pad
         )
-        self.add_sub_line_frame.grid(row=0, column=1, sticky=N+W)
+        self.add_sub_line_frame.grid(row=0, column=0, sticky=N+W)
         self.line_count = -1
         self.line_array = []
 
         # file name preview -----
         self.file_preview = LabelFrame(
-            self,
+            add_sub_file_prev_frame,
             text='File Name Preview',
             padding=self.parent_flabel_pad
         )
-        self.file_preview.grid(row=0, column=2, sticky=N)
+        self.file_preview.grid(row=1, column=0, sticky=N+S+W)
         self.file_preview_var = StringVar()
         self.file_preview_var.set('D2-4.0-XXXXX-XXXXX-XXXXX - Purchase Order.xlsx')
         preview_label = Label(self.file_preview, textvariable=self.file_preview_var)
@@ -250,7 +269,7 @@ class PurchaseInputPage(Frame):
         vendor_num_e.grid()
 
         submit_butt = Button(self.vendor_frame, text='Submit/Generate', command=self.SubmitGenerate)
-        submit_butt.grid(row=3, column=1)
+        submit_butt.grid(row=4, column=0, columnspan=2)
 
 
     def InputWid(self):
@@ -286,6 +305,8 @@ class PurchaseInputPage(Frame):
         descript = self.short_descript_var.get()
         project = self.proj_var.get()
 
+        self.short_name_entry.config(state='disabled')
+
 
         vendor_title = self.vendor_name_var.get()
 
@@ -313,6 +334,10 @@ class PurchaseInputPage(Frame):
 
 
     def ClearVendor(self):
+        self.short_name_entry.config(state='enabled')
+
+        self.vendor_list, self.short_vendor, self.vendor_contact, self.vendor_mail, self.vendor_num, self.vendor_location = \
+            self.GetVendorInfor()
 
         descript = self.short_descript_var.get()
         project = self.proj_var.get()
@@ -328,6 +353,7 @@ class PurchaseInputPage(Frame):
         # print(shin_dig)
         self.file_preview_var.set(shin_dig)
 
+        self.shrt_vendor_var.set('')
         self.vendor_name_var.set('')
         self.vendor_loc_var.set('')
         self.vendor_email_var.set('')
@@ -393,6 +419,34 @@ class PurchaseInputPage(Frame):
         shin_dig = f"D2-4.0-{shrt_vendor}-{project}-{descript} - Purchase Order.xlsx"
 
         self.file_preview_var.set(shin_dig)
+
+    def UpdateFNsd(self, key):
+        descript = self.short_descript_var.get()
+        project = self.proj_var.get()
+        shrt_vendor = self.shrt_vendor_var.get()
+
+        code = key.keycode
+
+        if 65 <= code <= 90 or 48 <= code <= 57 or 96 <= code <= 105:
+            char = key.char
+        elif code == 8:
+            shrt_vendor = shrt_vendor[:-1]
+            char = ''
+        else:
+            char = ''
+
+        if len(project) == 0:
+            project = 'XXXXX'
+        if len(descript) == 0:
+            descript = 'XXXXX'
+        if len(shrt_vendor) == 0 and code == 8:
+            shrt_vendor = 'XXXXX'
+        shrt_vendor = f'{shrt_vendor}{char}'
+
+        shin_dig = f"D2-4.0-{shrt_vendor}-{project}-{descript} - Purchase Order.xlsx"
+
+        self.file_preview_var.set(shin_dig)
+
 
     def GetVendorInfor(self):
         # ill code this later
@@ -462,7 +516,7 @@ class PurchaseInputPage(Frame):
         # special doc creation
         special_path = f"TRACKING\\Projects\\{other_shtuff_lst[3]}\\D2-4.0-{other_shtuff_lst[3]} - Purchase Order.xlsx"
 
-        print(f'____________________ FILE {path.isfile(special_path)}\n{special_path}')
+        # print(f'____________________ FILE {path.isfile(special_path)}\n{special_path}')
 
         if path.isfile(special_path):
             copyfile(special_path, purchase_order_dest_loc)

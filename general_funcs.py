@@ -7,7 +7,6 @@ from appending_funcs import append_df_to_excel
 from pandas import read_excel, read_csv
 
 
-
 def GetVar(var_file_loc: str, edit_q):
     working_output = []
     # getting opening and reading the file
@@ -194,3 +193,5 @@ def LoadVendors(col_count=7):
     return vendor_list
 
 
+def CheckIfOpen(file):
+    pass
