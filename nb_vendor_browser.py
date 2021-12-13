@@ -5,12 +5,10 @@ from operator import itemgetter
 from csv import writer, reader
 from os import startfile
 
-from general_funcs import AddDataToExcel, GetVar, LoadVendors
+from general_funcs import AddDataToExcel, LoadVendors
 from nb_project_browser import GetDocList
 from globalz import general_file_loc
 
-
-vendor_csv_loc = general_file_loc[6]
 
 
 
@@ -24,7 +22,7 @@ def SortVendorList(csv_list):
 
 def UpdateVendorCSV(i_row, vendor_list):
     i_row += 1
-
+    vendor_csv_loc = general_file_loc[6]
 
 
     with open(vendor_csv_loc, 'r', newline='') as reader_csvfile:
@@ -157,6 +155,7 @@ class DisplayVendors(Frame):
 
 
     def RefreshScroll(self, sort=None, clear_search=False):
+        print(f'<{__name__}> Doing Refresh... Sort: {sort}, Clear Search?: {clear_search}')
         if clear_search:
             self.search_var.set('')
 
@@ -192,6 +191,12 @@ class DisplayVendors(Frame):
                 vendor_loc.pop(iterz)
                 vendor_num.pop(iterz)
                 vendor_mail.pop(iterz)
+
+            if len(refresh_vendor_lst) == 0:
+                reset_no_result_q = messagebox.showinfo("No Match", f"There are not matching results for: {sort}\n"
+                                                                    f"Click reset button to clear search and refresh")
+
+
 
 
 

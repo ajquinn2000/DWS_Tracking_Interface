@@ -1,22 +1,19 @@
-import os
-
+from os import path, mkdir
 from shutil import copyfile
 from openpyxl import load_workbook
 from tkinter import messagebox
 from datetime import datetime
 
-from pandas import ExcelWriter, DataFrame
 
-from general_funcs import *
+from general_funcs import GetVar
 
 
 
 def CreateNewProject(shop_q=False):
-    # make sure that it is in the proper master directory
-    GoToTracking()
     # getting variables
-    file_loc_var = GetVar('Python_Source\\!variables\\new_project_var.txt', False)
+    # new_proj_loc_var = GetVar('Python_Source\\!variables\\new_project_var.txt', False)
     d2_loc = GetVar('Python_Source\\!variables\\Quality_Control_Files\\QC-D2-Locations.txt', False)
+    new_proj_loc_var = GetVar('Python_Source\\!variables\\new_project_var.txt', edit_q=False)
 
     tracking_stats_loc = 'Python_source\\!working_files\\dws_tracking_vals.txt'
     tracking_stats_all = GetVar(tracking_stats_loc, True)
@@ -24,13 +21,13 @@ def CreateNewProject(shop_q=False):
     tracking_stats = tracking_stats_all[1]
     tracking_alllines = tracking_stats_all[-1]
 
-    print(file_loc_var)
+    # print(new_proj_loc_var)
     print(tracking_stats)
 
     # xlsx templates to copy
     # Python_Source\!working_files\Template.xlsx
-    xlsx_template_loc = file_loc_var[0]
-    text_stats_temp_loc = file_loc_var[1]
+    xlsx_template_loc = new_proj_loc_var[0]
+    text_stats_temp_loc = new_proj_loc_var[1]
     # Quality_Control\\!D - Documents\\D2 - Documentation\\D2-7.0 - Packing Slip.xlsx
     packingslip_template_loc = d2_loc[6]
 
@@ -152,7 +149,7 @@ def CreateNewProject(shop_q=False):
     # )
 
     # making source file
-    os.mkdir(src_folder)
+    mkdir(src_folder)
     print(f"Made {project} src Folder")
 
     # making the project stats file to check if packing slips or certain purchases have been made
@@ -161,15 +158,15 @@ def CreateNewProject(shop_q=False):
     print(f"Made {project} Stats File")
 
     # making general/other scan folder
-    os.mkdir(general_scans)
+    mkdir(general_scans)
     print(f"Made {project} General_Scans Folder")
 
     # making purchase scan folder
-    os.mkdir(purchase_folder)
+    mkdir(purchase_folder)
     print(f"Made {project} Purchase_Scans Folder")
 
     # making cert scan folder
-    os.mkdir(certs_folder)
+    mkdir(certs_folder)
     print(f"Made {project} Material_Cert_Scans Folder")
 
     return project

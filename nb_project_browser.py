@@ -17,11 +17,11 @@ def OpenProject(project=None):
         # create a mini-window
         open_proj = Tk()
         #
-        entry = Entry(open_proj)
+        open_proj_entry = Entry(open_proj)
 
     # inner function
     def openOpenProject(event=None, skip_destroy=None):
-        proj = entry.get()
+        proj = open_proj_entry.get()
         proj_path = f'Projects\\{proj}'
         startfile(proj_path)
         # if the window was made, destroying it
@@ -31,7 +31,7 @@ def OpenProject(project=None):
     # if the project number is supplied when the outter function is called
     if project is not None:
         # making the given project number a string var so that the same inner function can be used
-        entry = StringVar(value=str(project))
+        open_proj_entry = StringVar(value=str(project))
         # calling inner function and skipping the destroying part since the window wasn't made
         openOpenProject(skip_destroy=True)
         # skipping junk below since the innter funtion wasn't called
@@ -44,12 +44,12 @@ def OpenProject(project=None):
     open_proj.bind('<Return>', openOpenProject)
 
     question_label.grid(row=0, column=0)
-    entry.grid(row=1, column=0)
+    open_proj_entry.grid(row=1, column=0)
     confirm_butt.grid(row=2, column=0)
 
 
 def CreateProjectDocument(project, doc):
-    print(f'Creating document {doc} for project {project}')
+    print(f'<{__name__}> Creating document {doc} for project {project}')
     if path.isdir(f'Projects\\{project}'):
         loc_list = ['D1 - Employee', 'D2 - Documentation', 'D3 - Manufacturing', 'D4 - Maintenance']
         file_loc_int = int(doc[1]) - 1
@@ -76,7 +76,7 @@ def CreateProjectDocument(project, doc):
 
         if doc == 'D2-7.0 - Packing Slip':
             temp_ps_tk = Toplevel()
-            temp_ps_tk.title('ps_pop_up')
+            temp_ps_tk.title('Create Packing Slip')
             test_frame = Frame(temp_ps_tk)
             test_frame.grid()
             temp_slip = PackingSlipPage(master=test_frame, from_project=project, top_level=temp_ps_tk)
@@ -85,7 +85,7 @@ def CreateProjectDocument(project, doc):
 
         if doc == 'D2-4.0 - Purchase Order':
             temp_po_tk = Toplevel()
-            temp_po_tk.title('po_pop_up')
+            temp_po_tk.title('Create Purchase Order')
             test_frame = Frame(temp_po_tk)
             test_frame.grid()
             temp_slip = PurchaseInputPage(master=test_frame, from_project=project, top_level=temp_po_tk)
@@ -179,6 +179,7 @@ class ProjectBrowser(Frame):
             given_proj_frame.destroy()
 
         for i, proj in enumerate(proj_list):
+            print(f"<{__name__}> Creating Proj: {proj} on line {i}")
             ProjLineClass(scrolls, doc_list, proj, i)
 
 
@@ -190,7 +191,7 @@ def CreateDocCommand():
     creat_doc_win = Toplevel()
     doc_list = GetDocList()
     proj_list = listdir('Projects')
-    print(f'Here {proj_list}')
+    # print(f'Here {proj_list}')
 
     doc_label = LabelFrame(creat_doc_win, text='|Choose Doc|', padding=parent_flabel_pad)
     doc_label.grid(row=0, column=0)

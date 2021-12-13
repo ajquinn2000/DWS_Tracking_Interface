@@ -5,18 +5,16 @@ from os import path
 
 
 from new_project import CreateNewProject
-
+from general_funcs import GoToTracking
 from nb_packing_slip import PackingSlipPage
 from nb_purchase_input import PurchaseInputPage
 from nb_project_browser import ProjectBrowser, OpenProject, GetDocList, CreateDocCommand
 from nb_vendor_browser import DisplayVendors
+from time_hour_input import TimeHourInput, AddWorker
 
 
-# add "add Worker" menu button w/ open worker folder menu button
 # add global file variables, so you do not have to keep opening the file
-# add tab for worker hours input
 # make igs log change xlsx from year to year
-# add packing slip stat
 # add in code to handle the new year Shop file creation, New all year IGS projects
 
 
@@ -72,6 +70,7 @@ def main():
     project_menu = Menu(menubar, tearoff=0)
     doc_menu = Menu(menubar, tearoff=0)
     vendor_menu = Menu(menubar, tearoff=0)
+    worker_menu = Menu(menubar, tearoff=0)
 
     project_menu.add_command(label="New Project", command=CreateNewProject)
     project_menu.add_command(label="Open Project", command=OpenProject)
@@ -84,6 +83,10 @@ def main():
     vendor_menu.add_command(label='Delete Vendor', command=app4.DeleteVendor)
     menubar.add_cascade(label='Vendors', menu=vendor_menu)
 
+    worker_menu.add_command(label='Submit Worker Hours', command=TimeHourInput)
+    worker_menu.add_command(label='Add Worker', command=AddWorker)
+    menubar.add_cascade(label='Workers', menu=worker_menu)
+
     dws_tracking_win.config(menu=menubar)
 
     #Main loop
@@ -91,5 +94,6 @@ def main():
 
 
 if __name__ == '__main__':
+    GoToTracking()
     main()
 

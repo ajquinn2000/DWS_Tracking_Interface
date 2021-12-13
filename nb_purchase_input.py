@@ -7,6 +7,7 @@ from os import path, mkdir, remove
 from csv import writer
 from pandas import read_csv
 
+from globalz import purchase_order_vars
 from appending_funcs import append_df_to_excel
 from general_funcs import GetVar, AddDataToExcel, IncrementGivenStat, LoadVendors
 from new_project import CreateNewProject
@@ -21,9 +22,9 @@ class PurchaseInputPage(Frame):
         self.grid()
         self.top_level = top_level
 
-        purchase_order_vars = GetVar('Python_Source\\!variables\\purchase_input_var.txt', False)
+        # purchase_order_vars = GetVar('Python_Source\\!variables\\purchase_input_var.txt', False)
         self.payment_options = purchase_order_vars[0].split(',')
-        # print(self.payment_options)
+        #  (self.payment_options)
         self.purchase_order_loc = purchase_order_vars[1]
         self.purchase_order_short = purchase_order_vars[2]
 
@@ -100,7 +101,7 @@ class PurchaseInputPage(Frame):
 
         self.vendor_list, self.short_vendor, self.vendor_contact, self.vendor_mail, self.vendor_num, self.vendor_location = \
             self.GetVendorInfor()
-        print(f'vendor_loc{self.vendor_location}')
+        print(f'<{__name__}> Looking for Vendor CSV File Location in: {self.vendor_location}')
 
         add_sub_file_prev_frame = Frame(self)
         add_sub_file_prev_frame.grid(row=0, column=1, sticky=N+W+S)
@@ -284,7 +285,7 @@ class PurchaseInputPage(Frame):
     def CreateLine(self):
         self.line_count += 1
 
-        print(f'Creating Line at row {self.line_count + 1}')
+        print(f'<{__name__}> Purchase Input- Creating Line at row {self.line_count + 1}')
 
         new_line = ALine(self.input_frame, self.line_count)
         self.line_array.append(new_line)
@@ -292,7 +293,7 @@ class PurchaseInputPage(Frame):
 
     def DeleteLastLine(self):
         if self.line_count <= 0:
-            print('Min number of lines reached')
+            print(f'<{__name__}> Min number of lines reached')
             messagebox.showwarning("No Can Do", "You can't do that homie. You only have one line left")
             return
 
@@ -462,7 +463,7 @@ class PurchaseInputPage(Frame):
         vendor_num = vendor_lists[5]
         vendor_mail = vendor_lists[6]
 
-        print(f'vendor\n{vendor_loc}')
+        # print(f'vendor\n{vendor_loc}')
 
         return vendor_list, short_vendor, vendor_contact, vendor_mail, vendor_num, vendor_loc
 
@@ -655,7 +656,7 @@ class PurchaseInputPage(Frame):
     def IncreasePurchaseCount(self):
         proj_stats_loc = f'Projects\\{self.proj_var.get()}\\!src\\stats.txt'
         if not path.isdir(f'Projects\\{self.proj_var.get()}\\!src'):
-            print(f'Sorry bruv, could not find: Projects\\{self.proj_var.get()}\\!src')
+            print(f'<{__name__}> Sorry bruv, could not find: Projects\\{self.proj_var.get()}\\!src')
             proj_stats_loc = f'Projects\\{self.proj_var.get()}\\src\\stats.txt'
 
         proj_stats = GetVar(proj_stats_loc, True)
@@ -748,8 +749,8 @@ class PurchaseInputPage(Frame):
                     item_quant_amnt_lst[2][i]
                 ]
             )
-        print(p_csv_lines)
-        print(l_csv_lines)
+        print(f"<{__name__}> Line to {project}: {p_csv_lines}")
+        print(f"<{__name__}> Line to {project} log: {l_csv_lines}")
         p_csv_q = False
         if not path.isfile(project_purchase_csv):
             p_csv_q = True

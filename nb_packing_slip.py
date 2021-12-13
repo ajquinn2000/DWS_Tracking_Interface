@@ -91,7 +91,7 @@ class PackingSlipPage(Frame):
 
     def CreateNewLine(self):
         self.line_count += 1
-        print(f'Creating Line at row {self.line_count + 1}')
+        print(f'<{__name__}> Creating Line at row {self.line_count + 1}')
 
         new_line = ALine(self.input_frame, self.line_count, self.igs_items, self.igs_var.get())
         self.line_list.append(new_line)
@@ -99,7 +99,7 @@ class PackingSlipPage(Frame):
 
     def DeleteLastLine(self):
         if self.line_count == 0:
-            print('Min number of lines reached')
+            print(f'<{__name__}> Min number of lines reached')
             messagebox.showwarning("No Can Do", "You can't do that homie. You only have one line left")
             return
         self.line_count -= 1
@@ -118,7 +118,7 @@ class PackingSlipPage(Frame):
         #     self.igs_var.set(True)
         #     checked_q = True
         #
-        print(f'IGS Toggle{checked_q}')
+        print(f'<{__name__}> IGS Toggle: {checked_q}')
 
         for line in self.line_list:
             line.ComboEntrySwitch(checked_q)
@@ -138,14 +138,14 @@ class PackingSlipPage(Frame):
 
         for line_class in self.line_list:
             output = line_class.GetLine()
-            print(output)
+            print(f"<{__name__}> Line Added: {output}")
 
             item_lst.append(output[0])
             qty_list.append(output[1])
 
         igs_q = self.igs_var.get()
 
-        print(ship_to)
+        print(f"<{__name__}> Shipping: {ship_to}")
 
         if self.CheckIfEmpty(item_lst, qty_list, ship_to, project_got):
             return

@@ -8,6 +8,8 @@ from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.drawing import image
 
+from globalz import general_file_loc
+
 
 def copy_excel_cell_range(
         src_ws: openpyxl.worksheet.worksheet.Worksheet,
@@ -186,7 +188,7 @@ def append_df_to_excel(
 
         if autofilter:
             worksheet.auto_filter.ref = worksheet.dimensions
-        print(df)
+        print(f"<{__name__}> {df}")
         for xl_col_no, dtyp in enumerate(df.dtypes, first_col):
             col_no = xl_col_no - first_col
             width = max(df.iloc[:, col_no].astype(str).str.len().max(),
@@ -220,13 +222,13 @@ def append_df_to_excel(
         )
         ws = wb.worksheets[0]
         if len(ws._images) != 1:
-            img = openpyxl.drawing.image.Image('Python_Source\\!working_files\\DWS_LOGO.png')
+            img = openpyxl.drawing.image.Image(general_file_loc[4])
 
             img.height = 155
             img.width = 220
 
             img.anchor = 'A1'
-            print('adding image')
+            print(f'<{__name__}> Adding Image')
             ws.add_image(img)
 
         # worksheet.insert_image('A1', 'Python_Source\\!working_files\\DWS_LOGO.png')

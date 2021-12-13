@@ -47,7 +47,7 @@ def GetVar(var_file_loc: str, edit_q):
 
 def GoToTracking():
     current_dir = getcwd().split('\\', -1)[-1]
-    print(f'Current Directory: {current_dir}')
+    print(f'<{__name__}> Current Directory: {current_dir}')
     if 'TRACKING' == current_dir:
         # print(f'In Master Directory: {getcwd()}\n'
         #       f'        (Should be TRACKING)')
@@ -56,11 +56,11 @@ def GoToTracking():
         # changing working directory to work within the tracking folder
         path_parent = path.dirname(getcwd())
         chdir(path_parent)
-        print(f'Changed Directory: {getcwd()}\n')
+        print(f'<{__name__}> Changed Directory: {getcwd()}\n')
         GoToTracking()
 
     else:
-        print(f'ERROR, UNPREDICTABLE BEHAVIOUR\n'
+        print(f'<{__name__}> ERROR, UNPREDICTABLE BEHAVIOUR\n'
               f'{current_dir}')
         return
 
@@ -75,13 +75,11 @@ def AddDataToExcel(
         scan_max: tuple,
         place_loc: tuple,
 ):
-
-    GoToTracking()
     # reads the info from the excel to get the column names
     df = read_excel(excel_loc, sheet_name=sheet_name)
 
     column_list = df.columns.tolist()
-    print(f'Columns extracted: \n{column_list}')
+    print(f'<{__name__}> Columns extracted: \n{column_list}')
     col_name_loc = [column_list[i] for i in col_loc]
 
     for column_name, row_list in zip(col_name_loc, row_list_data):
