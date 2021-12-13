@@ -10,6 +10,8 @@ from nb_project_browser import GetDocList
 from globalz import general_file_loc
 
 
+vendor_csv_loc = general_file_loc[6]
+
 
 
 def SortVendorList(csv_list):
@@ -22,7 +24,7 @@ def SortVendorList(csv_list):
 
 def UpdateVendorCSV(i_row, vendor_list):
     i_row += 1
-    vendor_csv_loc = general_file_loc[6]
+
 
 
     with open(vendor_csv_loc, 'r', newline='') as reader_csvfile:
