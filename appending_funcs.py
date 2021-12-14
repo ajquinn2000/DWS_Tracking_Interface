@@ -222,7 +222,8 @@ def append_df_to_excel(
         )
         ws = wb.worksheets[0]
         if len(ws._images) != 1:
-            img = openpyxl.drawing.image.Image(general_file_loc[4])
+            logo_png_loc = general_file_loc[0] + "\\" + general_file_loc[4]
+            img = openpyxl.drawing.image.Image(logo_png_loc)
 
             img.height = 155
             img.width = 220

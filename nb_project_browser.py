@@ -63,6 +63,25 @@ def CreateProjectDocument(project, doc):
             messagebox.showinfo('Brah, That Already Exists', 'That File Already Exists.\nEdit Document Instead...\nIDIOT')
             return
 
+        if doc == 'D2-7.0 - Packing Slip':
+            temp_ps_tk = Toplevel()
+            temp_ps_tk.title('Create Packing Slip')
+            test_frame = Frame(temp_ps_tk)
+            test_frame.grid()
+            temp_slip = PackingSlipPage(master=test_frame, from_project=project, top_level=temp_ps_tk)
+            temp_slip.grid()
+            return
+
+
+        if doc == 'D2-4.0 - Purchase Order':
+            temp_po_tk = Toplevel()
+            temp_po_tk.title('Create Purchase Order')
+            test_frame = Frame(temp_po_tk)
+            test_frame.grid()
+            temp_slip = PurchaseInputPage(master=test_frame, from_project=project, top_level=temp_po_tk)
+            temp_slip.grid()
+            return
+
         copyfile(copy_loc, destination)
         AddDataToExcel(
             excel_loc=destination,
@@ -74,26 +93,7 @@ def CreateProjectDocument(project, doc):
             scan_max=(2, 2)
         )
 
-        if doc == 'D2-7.0 - Packing Slip':
-            temp_ps_tk = Toplevel()
-            temp_ps_tk.title('Create Packing Slip')
-            test_frame = Frame(temp_ps_tk)
-            test_frame.grid()
-            temp_slip = PackingSlipPage(master=test_frame, from_project=project, top_level=temp_ps_tk)
-            temp_slip.grid()
-
-
-        if doc == 'D2-4.0 - Purchase Order':
-            temp_po_tk = Toplevel()
-            temp_po_tk.title('Create Purchase Order')
-            test_frame = Frame(temp_po_tk)
-            test_frame.grid()
-            temp_slip = PurchaseInputPage(master=test_frame, from_project=project, top_level=temp_po_tk)
-            temp_slip.grid()
-
-
-
-
+        messagebox.showinfo(f"Doc: {doc} Created", f"Doc: {doc} created for Project: {project}")
 
     else:
         create_new_proj = messagebox.askquestion(
@@ -156,34 +156,152 @@ class ProjectBrowser(Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.grid()
-        self.create_widgets()
+
+        self.proj_list = []
+        self.general_search_var = StringVar()
+        self.month_search_var = StringVar()
+        self.year_search_var = StringVar()
 
         self.scrolls_frame_lst = []
+        self.month_list = [
+            "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"
+        ]
+
+        self.scrolls = ScrollableFrame(self)
+        self.scrolls.grid(row=0, column=0, sticky=NSEW)
+
+        self.create_widgets()
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
-        scrolls = ScrollableFrame(self)
-        scrolls.grid(row=0, column=0, sticky=NSEW)
+        butt_lframe = LabelFrame(self, text="Reset and Search")
+        butt_lframe.grid(row=0, column=1, sticky=N + S + E + W)
 
-        refresh_butt = Button(self, text='⟳', command=lambda: self.RefreshScroll(scrolls), width=3)
-        refresh_butt.grid(row=0, column=1, sticky=N)
+        project_search_lframe = LabelFrame(butt_lframe, text="Project Search")
+        project_search_lframe.grid(row=1, column=0, sticky=N + S + E + W)
 
-        self.RefreshScroll(scrolls)
+        month_search_lframe = LabelFrame(butt_lframe, text="Month Search")
+        month_search_lframe.grid(row=2, column=0, sticky=N + S + E + W)
+
+        year_search_lframe = LabelFrame(butt_lframe, text="Year Search")
+        year_search_lframe.grid(row=3, column=0, sticky=N + S + E + W)
+
+        refresh_butt = Button(butt_lframe, text='⟳', command=lambda: self.RefreshScroll(self.scrolls, clear=True), width=3)
+        refresh_butt.grid(row=0, column=0, sticky=N + W)
+
+        self.RefreshScroll(self.scrolls)
+
+        search_combo = Combobox(project_search_lframe, textvariable=self.general_search_var, values=self.proj_list)
+        search_combo.grid(row=0, column=0, sticky=N + W)
+        search_combo.bind("<Key>", lambda key: self.SearchFunc(key))
+        search_combo.bind("<<ComboboxSelected>>", self.SearchFunc)
+
+        m_search_combo = Combobox(month_search_lframe, textvariable=self.month_search_var, state="readonly", values=self.month_list)
+        m_search_combo.grid(row=0, column=0, sticky=N + W)
+        m_search_combo.bind("<<ComboboxSelected>>", self.MonthYearSearch)
 
 
-    def RefreshScroll(self, scrolls):
-        proj_list = listdir('Projects')
+    def RefreshScroll(self, scrolls, sort=None, clear=None):
+        self.proj_list = listdir('Projects')
+        func_proj_list = self.proj_list
         doc_list = GetDocList()
+
+        if clear:
+            self.general_search_var.set("")
+            self.month_search_var.set("")
 
         for given_proj_frame in scrolls.scrollable_frame.winfo_children():
             given_proj_frame.destroy()
 
-        for i, proj in enumerate(proj_list):
+        if type(sort) == str:
+            iter_list = []
+            for ji, proj in enumerate(func_proj_list):
+                if sort.lower() not in proj.lower():
+                    # print(f"'{sort.lower()}' not in {vendor.lower()}")
+                    iter_list.append(ji)
+                else:
+                    # print(f"{ji}:'{sort.lower()}' is in {vendor.lower()}")
+                    pass
+            iter_list = sorted(iter_list, reverse=True)
+
+            for iterz in iter_list:
+                func_proj_list.pop(iterz)
+
+            if len(func_proj_list) == 0:
+                reset_no_result_q = messagebox.showinfo("No Match", f"There are not matching results for: {sort}\n"
+                                                                    f"Click reset button to clear search and refresh")
+
+        elif type(sort) == list:
+            func_proj_list = sort
+
+        for i, proj in enumerate(func_proj_list):
             print(f"<{__name__}> Creating Proj: {proj} on line {i}")
             ProjLineClass(scrolls, doc_list, proj, i)
 
 
             # doc_create_selector = Frame()
+
+
+    def SearchFunc(self, key=None):
+        search_var = self.general_search_var.get()
+
+        # print(key.x)
+
+        if key.x != 0:
+            code = key.keycode
+            if 65 <= code <= 90 or 48 <= code <= 57 or 96 <= code <= 105 or code == 32:
+                # print(f'{code}: added to search var')
+                typed_so_far = search_var + key.char
+            elif code == 8:
+                # print('did backspace')
+                typed_so_far = search_var[:-1]
+            else:
+                return
+
+        else:
+            typed_so_far = search_var
+
+        # print(key)
+        # print(f"'{typed_so_far}'")
+
+        self.RefreshScroll(scrolls=self.scrolls, sort=typed_so_far)
+
+
+    def MonthYearSearch(self, event, year_q=False):
+        func_proj = self.proj_list
+
+        export_project = []
+
+        if not year_q:
+            slice_var = (0, 2)
+
+            the_search = self.month_search_var.get()
+
+        else:
+            slice_var = (2, 4)
+
+            the_search = self.year_search_var.get()
+
+        for proj_index, given_project in enumerate(func_proj):
+            str_slice = given_project[slice_var[0]:slice_var[1]]
+
+            if str_slice == the_search:
+                export_project.append(func_proj[proj_index])
+
+        if len(export_project) == 0:
+            reset_no_result_q = messagebox.showinfo("No Match", f"There are not matching results for: {the_search}\n"
+                                                                f"Click reset button to clear search and refresh")
+            return
+
+        self.RefreshScroll(self.scrolls, export_project)
+
+
+
+
+
+
+
+
 
 def CreateDocCommand():
     parent_flabel_pad = (5, 5)
@@ -212,9 +330,13 @@ def CreateDocCommand():
         doc = doc_var.get()
         if project == 'Select Project':
             messagebox.showwarning("SMH...Error", 'Come on man... Choose a project')
+            return
         if doc == 'Choose Project':
             messagebox.showwarning('Bruv...Error', "You couldn't pic a document? It is soooo ez pz")
+            return
         CreateProjectDocument(project, doc)
+        creat_doc_win.destroy()
+
 
     sub_butt = Button(creat_doc_win, text='Submit', command=Submit)
     sub_butt.grid(row=4, column=0)

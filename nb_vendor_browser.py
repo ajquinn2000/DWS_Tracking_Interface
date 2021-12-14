@@ -91,8 +91,8 @@ def AppendCSV(line):
 class ScrollableFrame(Frame):
     def __init__(self, container):
         super().__init__(container)
-        self.config(height=500, width=550)
-        canvas = Canvas(self, height=500, width=550)
+        self.config(height=500, width=500)
+        canvas = Canvas(self, height=500, width=500)
         scrollbar = Scrollbar(self, orient="vertical", command=canvas.yview)
         self.scrollable_frame = Frame(canvas)
 
@@ -112,8 +112,10 @@ class ScrollableFrame(Frame):
 
 
 class DisplayVendors(Frame):
-    def __init__(self, master=None):
+    def __init__(self, master=None, vendor_fo_purch=None):
         super().__init__(master)
+
+        self.purch_og = vendor_fo_purch
 
         self.parent_flabel_pad = (5, 5)
 
@@ -232,7 +234,7 @@ class DisplayVendors(Frame):
         temp_vendor_win.title('Add Vendor')
         temp_frame = Frame(temp_vendor_win)
         temp_frame.grid()
-        temp_slip = AddVendor(vendor_class=self, master=temp_frame, top_level=temp_vendor_win)
+        temp_slip = AddVendor(vendor_class=self, vendor_purch_memory=self.purch_og, top_level=temp_vendor_win, master=temp_frame)
         temp_slip.grid()
 
     def DeleteVendor(self):
@@ -463,7 +465,7 @@ class VendorLineClass(Frame):
 
 
 class AddVendor(Frame):
-    def __init__(self, vendor_class, master=None, top_level=None):
+    def __init__(self, vendor_class, vendor_purch_memory, master=None, top_level=None):
         super().__init__(master)
         self.grid()
         self.parent_flabel_pad = (5, 5)
@@ -471,6 +473,7 @@ class AddVendor(Frame):
 
         self.vendor_class = vendor_class
         self.top_level = top_level
+        self.purch = vendor_purch_memory
 
         self.vendor_name_var = StringVar(master=master)
         self.shrt_vendor_name_var = StringVar(master=master)
@@ -595,6 +598,10 @@ class AddVendor(Frame):
             return
 
         self.vendor_class.RefreshScroll()
+
+        self.purch.ClearVendor()
+
+
 
         self.top_level.destroy()
 

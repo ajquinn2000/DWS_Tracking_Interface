@@ -102,7 +102,7 @@ def CreateNewProject(shop_q=False):
         return
 
     # making new project folder
-    os.mkdir(folder_path)
+    mkdir(folder_path)
 
     # copying the file
     copyfile(xlsx_template_loc, project_pathxlsx)

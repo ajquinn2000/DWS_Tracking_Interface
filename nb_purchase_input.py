@@ -137,6 +137,16 @@ class PurchaseInputPage(Frame):
         preview_label = Label(self.file_preview, textvariable=self.file_preview_var)
         preview_label.grid()
 
+        self.vendor_choice = LabelFrame(
+            self.vendor_frame,
+            text='Purchasing From Who?',
+            padding=self.parent_flabel_pad
+        )
+        self.vendor_choice.grid(row=1, column=0)
+        self.vendor_dropdow = Combobox(self.vendor_choice, textvariable=self.vendor_name_var, values=self.vendor_list)
+        self.vendor_dropdow.grid()
+        self.vendor_dropdow.bind('<<ComboboxSelected>>', self.UpdateVendorShtuff)
+
 
         self.create_widgets()
 
@@ -222,16 +232,6 @@ class PurchaseInputPage(Frame):
         vendor_reset_butt = Button(self.vendor_frame, text='⟳', command=self.ClearVendor)
         vendor_reset_butt.grid(row=0, sticky=W)
         vendor_reset_butt.config(width=3)
-
-        vendor_choice = LabelFrame(
-            self.vendor_frame,
-            text='Purchasing From Who?',
-            padding=self.parent_flabel_pad
-        )
-        vendor_choice.grid(row=1, column=0)
-        vendor_dropdow = Combobox(vendor_choice, textvariable=self.vendor_name_var, values=self.vendor_list)
-        vendor_dropdow.grid()
-        vendor_dropdow.bind('<<ComboboxSelected>>', self.UpdateVendorShtuff)
 
         vendor_loc_frame = LabelFrame(
             self.vendor_frame,
@@ -339,6 +339,14 @@ class PurchaseInputPage(Frame):
 
         self.vendor_list, self.short_vendor, self.vendor_contact, self.vendor_mail, self.vendor_num, self.vendor_location = \
             self.GetVendorInfor()
+
+        self.vendor_dropdow.destroy()
+
+        self.vendor_dropdow = Combobox(self.vendor_choice, textvariable=self.vendor_name_var, values=self.vendor_list)
+        self.vendor_dropdow.grid()
+        self.vendor_dropdow.bind('<<ComboboxSelected>>', self.UpdateVendorShtuff)
+
+
 
         descript = self.short_descript_var.get()
         project = self.proj_var.get()
@@ -737,7 +745,7 @@ class PurchaseInputPage(Frame):
                     other_shtuff_lst[2],
                     item_quant_amnt_lst[1][i], 
                     item_quant_amnt_lst[2][i],
-                    str(float(item_quant_amnt_lst[1][i]) * int(item_quant_amnt_lst[2][i]))
+                    str(float(item_quant_amnt_lst[1][i]) * float(item_quant_amnt_lst[2][i]))
                 ]
             )
 

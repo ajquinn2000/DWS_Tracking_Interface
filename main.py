@@ -13,9 +13,9 @@ from nb_vendor_browser import DisplayVendors
 from time_hour_input import TimeHourInput, AddWorker
 
 # If the igs inventory system file is open then do not clear the entries
-# add global file variables, so you do not have to keep opening the file
-# make igs log change xlsx from year to year
-# add in code to handle the new year Shop file creation, New all year IGS projects
+# add in yearly changing project folder
+    # add in code to handle the new year Shop file creation, New all year IGS projects
+    # make igs log change xlsx from year to year
 
 
 
@@ -28,8 +28,8 @@ def main():
 
     # Setup Tk()
     dws_tracking_win = Tk()
-    dws_tracking_win.geometry('850x600')
-    dws_tracking_win.title('main_boi')
+    dws_tracking_win.geometry('750x600')
+    dws_tracking_win.title('DWS Tracking Interface')
 
 
     # Setup the notebook (tabs)
@@ -61,8 +61,10 @@ def main():
     app2 = PackingSlipPage(master=nb_gen_packslip)
     app2.grid()
     app3 = PurchaseInputPage(master=nb_purchase_input)
+    # app3.ClearVendor()
+
     app3.grid(sticky=NSEW)
-    app4 = DisplayVendors(master=nb_vendor_browser)
+    app4 = DisplayVendors(master=nb_vendor_browser, vendor_fo_purch=app3)
     app4.grid()
 
 
