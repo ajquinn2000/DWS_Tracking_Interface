@@ -8,7 +8,7 @@ from new_project import CreateNewProject
 from general_funcs import GoToTracking
 from nb_packing_slip import PackingSlipPage
 from nb_purchase_input import PurchaseInputPage
-from nb_project_browser import ProjectBrowser, OpenProject, GetDocList, CreateDocCommand
+from nb_project_browser import ProjectBrowser, OpenProject, CreateDocCommand
 from nb_vendor_browser import DisplayVendors
 from time_hour_input import TimeHourInput, AddWorker
 
@@ -16,6 +16,12 @@ from time_hour_input import TimeHourInput, AddWorker
 # add in yearly changing project folder
     # add in code to handle the new year Shop file creation, New all year IGS projects
     # make igs log change xlsx from year to year
+
+# cant make vendor w/blank name
+
+
+# Minor bugs ___________
+# vendor search not refreshing list
 
 
 
