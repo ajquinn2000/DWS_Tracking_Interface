@@ -12,7 +12,7 @@ from nb_project_browser import ProjectBrowser, OpenProject, GetDocList, CreateDo
 from nb_vendor_browser import DisplayVendors
 from time_hour_input import TimeHourInput, AddWorker
 
-# If the igs inventory system file is open then do not clear the entries
+
 # add in yearly changing project folder
     # add in code to handle the new year Shop file creation, New all year IGS projects
     # make igs log change xlsx from year to year

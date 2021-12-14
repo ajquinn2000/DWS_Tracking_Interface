@@ -1,5 +1,6 @@
 from tkinter import StringVar, BooleanVar, IntVar, messagebox, N, W, E, S, NW, Text, END, Checkbutton
 from tkinter.ttk import Frame, Radiobutton, Label, Entry, Button, Combobox, LabelFrame
+from os import startfile
 
 from general_funcs import AddDataToExcel, GetVar
 from igs_funcs import LoadData, GoToTracking, IGS_Generate_Update_Logs
@@ -15,7 +16,8 @@ class PackingSlipPage(Frame):
         self.destrou_top_level = top_level
 
         igs_shtuff = GetVar('Python_Source\!variables\igs_tracking_var.txt', False)
-        list_thang = LoadData(igs_shtuff[2])
+        self.inv_file_loc = igs_shtuff[2]
+        list_thang = LoadData(self.inv_file_loc)
         self.igs_items = list_thang[0]
 
         self.project_butt = from_project
@@ -41,8 +43,8 @@ class PackingSlipPage(Frame):
             project_label = Label(self.ship_proj_frame, text='|Project Number|')
             project_entry = Entry(self.ship_proj_frame, textvariable=self.project_var)
 
-            project_label.grid(row=5, column=0, sticky=W)
-            project_entry.grid(row=6, column=0, ipadx=30)
+            project_label.grid(row=5, column=0, columnspan=2, sticky=W)
+            project_entry.grid(row=6, column=0, columnspan=2, ipadx=30)
 
             self.window_q = False
 
@@ -50,7 +52,7 @@ class PackingSlipPage(Frame):
         self.ship_to_var = StringVar()
 
         self.ship_to_text = Text(self.ship_proj_frame, height=3, width=23)
-        self.ship_to_text.grid(row=4, column=0)
+        self.ship_to_text.grid(row=4, column=0, columnspan=2)
 
         self.igs_var = BooleanVar(value=False)
         self.igs_checkbox = Checkbutton(
@@ -77,6 +79,9 @@ class PackingSlipPage(Frame):
         sub_butt = Button(self.add_sub_frame, text='-', command=self.DeleteLastLine)
         sub_butt.grid(row=0, column=1, sticky=E)
 
+        open_inventory_butt = Button(self.ship_proj_frame, text='Open IGS File', command=self.OpenInv)
+        open_inventory_butt.grid(row=7, column=1)
+
         # ship_to_label = Label(self.ship_proj_frame, text='|Ship To|')
         # ship_to_label.grid(row=3, column=0)
 
@@ -84,7 +89,7 @@ class PackingSlipPage(Frame):
 
 
         submit_butt = Button(self.ship_proj_frame, text='Submit/Generate', command=self.GetLinesAndSubmit)
-        submit_butt.grid(row=8, column=0)
+        submit_butt.grid(row=8, column=0, columnspan=2)
 
         self.CreateNewLine()
 
@@ -150,6 +155,19 @@ class PackingSlipPage(Frame):
         if self.CheckIfEmpty(item_lst, qty_list, ship_to, project_got):
             return
 
+        if igs_q:
+            submit_igs_junk = IGS_Generate_Update_Logs(
+                shipping_loc=ship_to,
+                proj=project_got,
+                itms=item_lst,
+                qtys=qty_list
+            )
+
+            exit_q = submit_igs_junk.CheckandUpdate()
+
+            if exit_q:
+                return
+
         for line_class in self.line_list:
             line_class.Delete()
             # input_frame = line_class.GiveFrameData()
@@ -159,15 +177,7 @@ class PackingSlipPage(Frame):
             # input_frame.destroy()
 
 
-        if igs_q:
-            submit_igs_junk = IGS_Generate_Update_Logs(
-                shipping_loc=ship_to,
-                proj=project_got,
-                itms=item_lst,
-                qtys=qty_list
-            )
 
-            submit_igs_junk.CheckandUpdate()
         if not igs_q:
             packing_slip_loc = f'Projects\\{project_got}\\D2-7.0-{project_got} - Packing Slip.xlsx'
 
@@ -221,6 +231,9 @@ class PackingSlipPage(Frame):
             )
             return True
 
+
+    def OpenInv(self):
+        startfile(self.inv_file_loc)
 
 class ALine:
 

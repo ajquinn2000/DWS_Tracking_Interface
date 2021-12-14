@@ -51,7 +51,7 @@ class IGS_Generate_Update_Logs:
                 title='Please Close File',
                 message='Please close the IGS_Inventory_Tracking.xlsx file before continuing.'
             )
-            return
+            return True
 
         comment_lst = []
 
