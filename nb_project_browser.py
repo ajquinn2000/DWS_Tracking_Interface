@@ -48,7 +48,7 @@ def OpenProject(project=None):
     confirm_butt.grid(row=2, column=0)
 
 
-def CreateProjectDocument(project, doc):
+def CreateProjectDocument(project, doc, window_q=True):
     print(f'<{__name__}> Creating document {doc} for project {project}')
     if path.isdir(f'Projects\\{project}'):
         loc_list = ['D1 - Employee', 'D2 - Documentation', 'D3 - Manufacturing', 'D4 - Maintenance']
@@ -63,7 +63,7 @@ def CreateProjectDocument(project, doc):
             messagebox.showinfo('Brah, That Already Exists', 'That File Already Exists.\nEdit Document Instead...\nIDIOT')
             return
 
-        if doc == 'D2-7.0 - Packing Slip':
+        if doc == 'D2-7.0 - Packing Slip' and window_q:
             temp_ps_tk = Toplevel()
             temp_ps_tk.title('Create Packing Slip')
             test_frame = Frame(temp_ps_tk)
@@ -73,7 +73,7 @@ def CreateProjectDocument(project, doc):
             return
 
 
-        if doc == 'D2-4.0 - Purchase Order':
+        if doc == 'D2-4.0 - Purchase Order' and window_q:
             temp_po_tk = Toplevel()
             temp_po_tk.title('Create Purchase Order')
             test_frame = Frame(temp_po_tk)

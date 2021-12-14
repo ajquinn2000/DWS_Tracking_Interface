@@ -4,6 +4,7 @@ from os import startfile
 
 from general_funcs import AddDataToExcel, GetVar
 from igs_funcs import LoadData, GoToTracking, IGS_Generate_Update_Logs
+from nb_project_browser import CreateProjectDocument
 
 
 class PackingSlipPage(Frame):
@@ -155,6 +156,8 @@ class PackingSlipPage(Frame):
         if self.CheckIfEmpty(item_lst, qty_list, ship_to, project_got):
             return
 
+        CreateProjectDocument(project_got, 'D2-7.0 - Packing Slip', window_q=False)
+
         if igs_q:
             submit_igs_junk = IGS_Generate_Update_Logs(
                 shipping_loc=ship_to,
@@ -168,16 +171,6 @@ class PackingSlipPage(Frame):
             if exit_q:
                 return
 
-        for line_class in self.line_list:
-            line_class.Delete()
-            # input_frame = line_class.GiveFrameData()
-            # for widget in input_frame.winfo_children():
-            #     widget.destroy()
-            #
-            # input_frame.destroy()
-
-
-
         if not igs_q:
             packing_slip_loc = f'Projects\\{project_got}\\D2-7.0-{project_got} - Packing Slip.xlsx'
 
@@ -190,6 +183,14 @@ class PackingSlipPage(Frame):
                 scan_min=(0, 0),
                 scan_max=(20, 5)
             )
+
+        for line_class in self.line_list:
+            line_class.Delete()
+            # input_frame = line_class.GiveFrameData()
+            # for widget in input_frame.winfo_children():
+            #     widget.destroy()
+            #
+            # input_frame.destroy()
 
         self.ship_to_text.delete('1.0', END)
 

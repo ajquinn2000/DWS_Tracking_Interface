@@ -24,7 +24,7 @@ def copy_excel_cell_range(
 ) -> openpyxl.worksheet.worksheet.Worksheet:
     """
     copies all cells from the source worksheet [src_ws] starting from [min_row] row
-    and [min_col] column up to [max_row] row and [max_col] column
+    and [min_col] column up to [max_row] row and [max_col] columnpy
     to target worksheet [tgt_ws] starting from [tgt_min_row] row
     and [tgt_min_col] column.
 
