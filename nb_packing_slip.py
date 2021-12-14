@@ -1,10 +1,49 @@
 from tkinter import StringVar, BooleanVar, IntVar, messagebox, N, W, E, S, NW, Text, END, Checkbutton
 from tkinter.ttk import Frame, Radiobutton, Label, Entry, Button, Combobox, LabelFrame
-from os import startfile
+from os import startfile, path
+from shutil import copyfile
 
 from general_funcs import AddDataToExcel, GetVar
 from igs_funcs import LoadData, GoToTracking, IGS_Generate_Update_Logs
-from nb_project_browser import CreateProjectDocument
+
+
+
+def CreateProjectDocument(project, doc):
+    print(f'<{__name__}> Creating document {doc} for project {project}')
+    if path.isdir(f'Projects\\{project}'):
+        loc_list = ['D1 - Employee', 'D2 - Documentation', 'D3 - Manufacturing', 'D4 - Maintenance']
+        file_loc_int = int(doc[1]) - 1
+        copy_loc = f'Quality_Control\\!D - Documents\\{loc_list[file_loc_int]}\\{doc}.xlsx'
+
+
+        split_doc = doc.split(' - ')
+        destination = f'Projects\\{project}\\{split_doc[0]}-{project} - {split_doc[1]}.xlsx'
+
+        if path.exists(destination):
+            messagebox.showinfo('Brah, That Already Exists', 'That File Already Exists.\nEdit Document Instead...\nIDIOT')
+            return
+
+
+        copyfile(copy_loc, destination)
+        AddDataToExcel(
+            excel_loc=destination,
+            sheet_name='INPUT',
+            col_loc=[1],
+            row_list_data=[str(project)],
+            place_loc=(0, 0),
+            scan_min=(0, 0),
+            scan_max=(2, 2)
+        )
+
+        messagebox.showinfo(f"Doc: {doc} Created", f"Doc: {doc} created for Project: {project}")
+
+    else:
+        create_new_proj = messagebox.showwarning(
+            f'{project} Does Not Exist, bruv',
+            f'{project} does not exist. Check your Project Number, homie?'
+        )
+        return
+
 
 
 class PackingSlipPage(Frame):
@@ -156,7 +195,7 @@ class PackingSlipPage(Frame):
         if self.CheckIfEmpty(item_lst, qty_list, ship_to, project_got):
             return
 
-        CreateProjectDocument(project_got, 'D2-7.0 - Packing Slip', window_q=False)
+        first_exit_q = CreateProjectDocument(project_got, 'D2-7.0 - Packing Slip')
 
         if igs_q:
             submit_igs_junk = IGS_Generate_Update_Logs(
