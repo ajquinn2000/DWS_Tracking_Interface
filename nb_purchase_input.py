@@ -287,7 +287,7 @@ class PurchaseInputPage(Frame):
     def CreateLine(self):
         self.line_count += 1
 
-        print(f'<{__name__}> Purchase Input- Creating Line at row {self.line_count + 1}')
+        print(f'<{__name__}> Creating Line at row {self.line_count + 1}')
 
         new_line = ALine(self.input_frame, self.line_count)
         self.line_array.append(new_line)
@@ -747,7 +747,8 @@ class PurchaseInputPage(Frame):
         year = now_now.year
         month = now_now.strftime('%B')
         full_date = now_now.strftime('%m/%d/%Y')
-        cc_purchase_log = f'Finance\\Monthly_Credit_Card_Purchases\\{year}\\{month}.csv'
+        cc_purch_log_year_folder = f'Finance\\Monthly_Credit_Card_Purchases\\{year}'
+        cc_purchase_log = f'{cc_purch_log_year_folder}\\{month}.csv'
 
         p_csv_lines = []
         l_csv_lines = [
@@ -785,6 +786,9 @@ class PurchaseInputPage(Frame):
         print(f"<{__name__}> Line to {project}: {p_csv_lines}")
         print(f"<{__name__}> Line to {project} log: {l_csv_lines}")
         p_csv_q = False
+
+
+
         if not path.isfile(project_purchase_csv):
             p_csv_q = True
 
@@ -807,15 +811,21 @@ class PurchaseInputPage(Frame):
 
         # for keeping track of credit card purchases
         if other_shtuff_lst[2] != 'NET 30':
+
+            if not path.isdir(cc_purch_log_year_folder):
+                mkdir(cc_purch_log_year_folder)
+
             cc_csv_q = False
             if not path.isfile(cc_purchase_log):
                 cc_csv_q = True
-            with open(project_log_csv, 'a+', newline='') as write_obj:
+            with open(cc_purchase_log, 'a+', newline='') as write_obj:
                 csv_writer = writer(write_obj)
 
                 if cc_csv_q:
                     cc_csv_first_line = ['Date', 'Description', 'Vendor', 'Charged To', 'Price each/per weight', 'Qty', 'Total Each']
                     csv_writer.writerow(cc_csv_first_line)
+
+                print(f"Writing lines: {p_csv_lines} to file: {cc_purchase_log}")
 
                 csv_writer.writerows(p_csv_lines)
 

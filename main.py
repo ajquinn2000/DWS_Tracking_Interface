@@ -13,13 +13,14 @@ from nb_vendor_browser import DisplayVendors
 from time_hour_input import TimeHourInput, AddWorker
 
 
-# fix new project shop creation
+# fix new project shop creation, so that it creates a new one every month and year
+    # also so the user can select shop in purchase input
 # add in yearly changing project folder
     # add in year search and set to current year
     # add in code to handle the new year Shop file creation, New all year IGS projects
     # make igs log change xlsx from year to year
 
-# cant make vendor w/blank name
+# prevent making vendor w/blank name
 
 
 # Minor bugs ___________
