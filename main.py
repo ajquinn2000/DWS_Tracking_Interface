@@ -13,7 +13,9 @@ from nb_vendor_browser import DisplayVendors
 from time_hour_input import TimeHourInput, AddWorker
 
 
+# fix new project shop creation
 # add in yearly changing project folder
+    # add in year search and set to current year
     # add in code to handle the new year Shop file creation, New all year IGS projects
     # make igs log change xlsx from year to year
 

@@ -66,13 +66,15 @@ class PurchaseInputPage(Frame):
             )
             project_num_frame.grid(row=2, column=1, sticky=N+W)
 
-            proj_entry = Entry(
+            proj_entry = Combobox(
                 project_num_frame,
                 textvariable=self.proj_var,
-                width=self.entry_width
+                width=self.entry_width,
+                values="Shop"
             )
             proj_entry.grid()
             proj_entry.bind("<Key>", lambda key: self.UpdateFNP(key))
+            proj_entry.bind("<<ComboboxSelected>>", self.UpdateFNP)
 
         else:
             self.proj_var.set(from_project)
@@ -512,18 +514,41 @@ class PurchaseInputPage(Frame):
         if continue_q != True:
             return
 
+        if other_shtuff_lst[3] == "Shop":
+            now = datetime.now()
+            date_time = now.strftime('%m/%d/%Y - %H:%M:%S')
+            year = now.year
+            month = now.strftime('%B')
 
-        purchase_order_folder = f'Projects\\{other_shtuff_lst[3]}\\Purchase_Orders'
 
-        if not path.isdir(purchase_order_folder):
-            mkdir(purchase_order_folder)
+            shop_year_folder = f'Shop\\{year}'
+            shop_month_folder = f'{shop_year_folder}\\{month}'
+            purchase_order_folder = f'{shop_month_folder}\\Purchase_Orders'
+
+            if not path.isdir(shop_year_folder):
+                print(f'HAPPY NEW YEAR!!!'
+                      f'\nMade {year} Shop folder')
+                mkdir(shop_year_folder)
+
+            if not path.isdir(shop_month_folder):
+
+                pass
+
+
+
+        else:
+
+            purchase_order_folder = f'Projects\\{other_shtuff_lst[3]}\\Purchase_Orders'
+
+            if not path.isdir(purchase_order_folder):
+                mkdir(purchase_order_folder)
 
         dws_tot_count = self.IncreasePurchaseCount()
 
         purchase_order_dest_loc = f'{purchase_order_folder}\\{dws_tot_count}{self.file_preview_var.get()}'
 
         # special doc creation
-        special_path = f"TRACKING\\Projects\\{other_shtuff_lst[3]}\\D2-4.0-{other_shtuff_lst[3]} - Purchase Order.xlsx"
+        special_path = f"Projects\\{other_shtuff_lst[3]}\\D2-4.0-{other_shtuff_lst[3]} - Purchase Order.xlsx"
 
         # print(f'____________________ FILE {path.isfile(special_path)}\n{special_path}')
 
@@ -790,7 +815,7 @@ class PurchaseInputPage(Frame):
 
                 if cc_csv_q:
                     cc_csv_first_line = ['Date', 'Description', 'Vendor', 'Charged To', 'Price each/per weight', 'Qty', 'Total Each']
-                    csv_writer.writerow(*cc_csv_first_line)
+                    csv_writer.writerow(cc_csv_first_line)
 
                 csv_writer.writerows(p_csv_lines)
 
@@ -868,3 +893,4 @@ class ALine:
 
     def GiveFrameData(self):
         return self.line_frame
+

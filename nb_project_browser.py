@@ -200,6 +200,11 @@ class ProjectBrowser(Frame):
         m_search_combo.grid(row=0, column=0, sticky=N + W)
         m_search_combo.bind("<<ComboboxSelected>>", self.MonthYearSearch)
 
+        m_search_combo = Combobox(month_search_lframe, textvariable=self.month_search_var, state="readonly",
+                                  values=self.month_list)
+        m_search_combo.grid(row=0, column=0, sticky=N + W)
+        m_search_combo.bind("<<ComboboxSelected>>", self.MonthYearSearch)
+
 
     def RefreshScroll(self, scrolls, sort=None, clear=None):
         self.proj_list = listdir('Projects')

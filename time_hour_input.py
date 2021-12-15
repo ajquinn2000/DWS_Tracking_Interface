@@ -1,5 +1,4 @@
 import widgets
-from appending_funcs import append_df_to_excel
 from globalz import general_file_loc
 
 from os import listdir, path, getcwd, remove, mkdir
@@ -11,7 +10,6 @@ from csv import writer
 from pandas import read_csv, DataFrame, ExcelWriter
 from openpyxl import load_workbook
 from calendar import month_name
-from shutil import copyfile
 from PIL import ImageTk, Image
 
 
