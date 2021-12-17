@@ -617,6 +617,8 @@ class PurchaseInputPage(Frame):
         self.quote_id_var.set('')
         self.expected_del_var.set('')
         self.vendor_loc_var.set('')
+        self.shrt_vendor_var.set('')
+        self.short_name_entry.config(state='enable')
         self.file_preview_var.set('D2-4-XXXXX-XXXXX-XXXXX - Purchase Order.xlsx')
 
         if self.top_level != None:
