@@ -1,7 +1,8 @@
 from tkinter import StringVar, BooleanVar, IntVar, messagebox, N, W, E, S, NW, Text, END, Checkbutton
 from tkinter.ttk import Frame, Label, Entry, Button, Combobox, LabelFrame
-from os import startfile, path
+from os import startfile, path, mkdir
 from shutil import copyfile
+from datetime import datetime
 
 from general_funcs import AddDataToExcel, GetVar
 from igs_funcs import LoadData, GoToTracking, IGS_Generate_Update_Logs
@@ -222,6 +223,17 @@ class PackingSlipPage(Frame):
                 scan_min=(0, 0),
                 scan_max=(20, 5)
             )
+
+            now = datetime.now()
+            year = now.year
+
+            general_year_po_loc = f"Finance\\Yearly_Packing_Slips\\{year}"
+            ps_year_loc = f"{general_year_po_loc}\\D2-7-{project_got} - Packing Slip.xlsx"
+
+            if not path.isdir(general_year_po_loc):
+                mkdir(general_year_po_loc)
+
+                copyfile(packing_slip_loc, ps_year_loc)
 
         for line_class in self.line_list:
             line_class.Delete()

@@ -517,12 +517,18 @@ class PurchaseInputPage(Frame):
         if continue_q != True:
             return
 
+        now = datetime.now()
+        year = now.year
+
+        general_year_ps_loc = f"Finance\\Yearly_Purchase_Orders\\{year}"
+
+        if not path.isdir(general_year_ps_loc):
+            mkdir(general_year_ps_loc)
+
         shop_q = False
         shop_year_folder = None
         if other_shtuff_lst[3] == "Shop":
-            now = datetime.now()
-            date_time = now.strftime('%m/%d/%Y - %H:%M:%S')
-            year = now.year
+
             month = now.strftime('%B')
 
 
@@ -551,7 +557,11 @@ class PurchaseInputPage(Frame):
 
         dws_tot_count = self.IncreasePurchaseCount(shop_q)
 
-        purchase_order_dest_loc = f'{purchase_order_folder}\\PO{dws_tot_count} {self.file_preview_var.get()}'
+        final_file_name = f'PO{dws_tot_count} {self.file_preview_var.get()}'
+
+        general_po_loc = f"{general_year_po_loc}\\{final_file_name}"
+
+        purchase_order_dest_loc = f'{purchase_order_folder}\\{final_file_name}'
 
 
 
@@ -585,6 +595,8 @@ class PurchaseInputPage(Frame):
 
 
         self.AddToMasterExcel(item_quant_amnt_lst, other_shtuff_lst, dws_tot_count, shop_loc=shop_year_folder)
+
+        copyfile(purchase_order_dest_loc, general_po_loc)
 
         for line in self.line_array:
             line.Delete()

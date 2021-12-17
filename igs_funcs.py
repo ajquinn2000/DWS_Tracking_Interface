@@ -222,6 +222,17 @@ class IGS_Generate_Update_Logs:
             scan_max=(20, 5)
         )
 
+        now = datetime.now()
+        year = now.year
+
+        general_year_ps_loc = f"Finance\\Yearly_Packing_Slips\\{year}"
+        ps_year_loc = f"{general_year_ps_loc}\\D2-7-{self.project} - Packing Slip.xlsx"
+
+        if not path.isdir(general_year_ps_loc):
+            mkdir(general_year_ps_loc)
+
+            copyfile(packing_slip_loc, ps_year_loc)
+
 
 def LoadData(inventory_loc):
     """Loads the information from the IGS inventory file"""
