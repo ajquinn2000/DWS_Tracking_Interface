@@ -221,6 +221,8 @@ class ProjectBrowser(Frame):
 
 
     def RefreshScroll(self, scrolls, sort=None, clear=None):
+        self.GetYears()
+
         self.proj_list = listdir('Projects')
         func_proj_list = self.proj_list
         doc_list = GetDocList()
