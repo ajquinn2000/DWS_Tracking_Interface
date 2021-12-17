@@ -13,12 +13,7 @@ from nb_vendor_browser import DisplayVendors
 from time_hour_input import TimeHourInput, AddWorker
 
 
-# fix new project shop creation, so that it creates a new one every month and year
-    # also so the user can select shop in purchase input
-# add in yearly changing project folder
-    # add in year search and set to current year
-    # add in code to handle the new year Shop file creation, New all year IGS projects
-    # make igs log change xlsx from year to year
+
 
 # prevent making vendor w/blank name
 
@@ -37,7 +32,7 @@ def main():
 
     # Setup Tk()
     dws_tracking_win = Tk()
-    dws_tracking_win.geometry('750x600')
+    dws_tracking_win.geometry('775x600')
     dws_tracking_win.title('DWS Tracking Interface')
 
 

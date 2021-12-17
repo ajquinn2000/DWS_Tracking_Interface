@@ -210,7 +210,7 @@ class IGS_Generate_Update_Logs:
                 csv_writer.writerow(output_row)
 
     def Generate_Packing_Slip(self):
-        packing_slip_loc = f'Projects\\{self.project}\\D2-7.0-{self.project} - Packing Slip.xlsx'
+        packing_slip_loc = f'Projects\\{self.project}\\D2-7-{self.project} - Packing Slip.xlsx'
 
         AddDataToExcel(
             excel_loc=packing_slip_loc,
@@ -218,6 +218,7 @@ class IGS_Generate_Update_Logs:
             col_loc=[2, 3, 4],
             row_list_data=[self.shipping_loca, self.quantitties, self.items],
             place_loc=(0, 0),
+            scan_min=(0, 0),
             scan_max=(20, 5)
         )
 

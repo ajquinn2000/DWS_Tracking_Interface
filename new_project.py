@@ -28,7 +28,7 @@ def CreateNewProject(shop_q=False):
     # Python_Source\!working_files\Template.xlsx
     xlsx_template_loc = new_proj_loc_var[0]
     text_stats_temp_loc = new_proj_loc_var[1]
-    # Quality_Control\\!D - Documents\\D2 - Documentation\\D2-7.0 - Packing Slip.xlsx
+    # Quality_Control\\!D - Documents\\D2 - Documentation\\D2-7 - Packing Slip.xlsx
     packingslip_template_loc = d2_loc[6]
 
 
@@ -42,18 +42,27 @@ def CreateNewProject(shop_q=False):
     now_is_time = datetime.now()
     date_string = now_is_time.strftime('%m%y')
     month_int = now_is_time.strftime('%m')
+    month_str = now_is_time.strftime('%B')
     print(f'Month: {month_int}')
-    if month_int == '01' and prev_proj_mont == '12':
+    if month_int == '01' and (prev_proj_mont == '12' or prev_proj_mont == '11'):
         projects_t_date = '01'
 
-    new_project_num = date_string + projects_t_date
+    if shop_q:
+        title = f'New Month {month_str}'
+        message = f'Creating New Month Project {month_str}'
 
-    title = f'New Project w/{new_project_num}?'
-    message = f'Do you want "{new_project_num}" to be the Project Number?\n\n' \
-              f'Press "Yes" to Continue\n' \
-              f'Press "Cancel" to cancel'
+        messagebox.showinfo(title=title, message=message)
 
-    yes = messagebox.askokcancel(title=title, message=message)
+        yes = True
+    else:
+        new_project_num = date_string + projects_t_date
+
+        title = f'New Project w/{new_project_num}?'
+        message = f'Do you want "{new_project_num}" to be the Project Number?\n\n' \
+                  f'Press "Yes" to Continue\n' \
+                  f'Press "Cancel" to cancel'
+
+        yes = messagebox.askokcancel(title=title, message=message)
 
     # print(f'Yes: {yes}')
 
@@ -75,7 +84,7 @@ def CreateNewProject(shop_q=False):
         # project folder locations
         folder_path = f'Projects\\{project}'
         project_pathxlsx = f'{folder_path}\\{project}-master.xlsx'
-        packingslip_pathxlsx = f'{folder_path}\\D2-7.0-{project} - Packing Slip.xlsx'
+        packingslip_pathxlsx = f'{folder_path}\\D2-7-{project} - Packing Slip.xlsx'
         src_folder = f'{folder_path}\\!src'
         purchase_folder = f'{folder_path}\\Purchase_Scans'
         certs_folder = f'{folder_path}\\Material_Cert_Scans'
@@ -83,23 +92,30 @@ def CreateNewProject(shop_q=False):
 
     else:
         year = now_is_time.year
+        month = now_is_time.strftime('%B')
 
         # project folder locations
-        folder_path = f'Shop\\{year}'
-        project_pathxlsx = f'{folder_path}\\{year}-master.xlsx'
+        year_folder_path = f'Shop\\{year}'
+        folder_path = f"{year_folder_path}\\{month}"
+        project_pathxlsx = f'{folder_path}\\{month}-master.xlsx'
         src_folder = f'{folder_path}\\!src'
         purchase_folder = f'{folder_path}\\Purchase_Scans'
         certs_folder = f'{folder_path}\\Material_Cert_Scans'
         general_scans = f'{folder_path}\\General_Scans'
 
-        project = year
+        if not path.isdir(year_folder_path):
+            mkdir(year_folder_path)
+
+        project = month
 
     if path.isdir(folder_path):
         warning_message = f'Error Creating Project: {project}\n' \
                           f'Project {folder_path} already exists\n' \
-                          f'Try again, dumbo...smh'
+                          f'Try again...smh'
         messagebox.showwarning(title='Cannot Create Project', message=warning_message)
         return
+
+
 
     # making new project folder
     mkdir(folder_path)

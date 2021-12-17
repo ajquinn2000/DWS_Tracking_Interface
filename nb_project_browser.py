@@ -1,9 +1,9 @@
+import datetime
 from tkinter import StringVar, Canvas, messagebox, N, W, E, S, NSEW, Tk, Scrollbar, Toplevel
-from tkinter.ttk import Frame, Label, Entry, Button, LabelFrame, Combobox, Style
+from tkinter.ttk import Frame, Label, Entry, Button, LabelFrame, Combobox
 
 from os import startfile, listdir, path
 from shutil import copyfile
-from time import sleep
 
 from nb_purchase_input import PurchaseInputPage
 from nb_packing_slip import PackingSlipPage
@@ -60,10 +60,12 @@ def CreateProjectDocument(project, doc):
         destination = f'Projects\\{project}\\{split_doc[0]}-{project} - {split_doc[1]}.xlsx'
 
         if path.exists(destination):
-            messagebox.showinfo('Brah, That Already Exists', 'That File Already Exists.\nEdit Document Instead...\nIDIOT')
+            messagebox.showinfo('Bruv, That Already Exists', 'That File Already Exists.\n\n'
+                                                             f'If you want to create another version, change name of '
+                                                             f'{destination} first...')
             return
 
-        if doc == 'D2-7.0 - Packing Slip':
+        if doc == 'D2-7 - Packing Slip':
             temp_ps_tk = Toplevel()
             temp_ps_tk.title('Create Packing Slip')
             test_frame = Frame(temp_ps_tk)
@@ -73,7 +75,7 @@ def CreateProjectDocument(project, doc):
             return
 
 
-        if doc == 'D2-4.0 - Purchase Order':
+        if doc == 'D2-4 - Purchase Order':
             temp_po_tk = Toplevel()
             temp_po_tk.title('Create Purchase Order')
             test_frame = Frame(temp_po_tk)
@@ -157,20 +159,32 @@ class ProjectBrowser(Frame):
         super().__init__(master)
         self.grid()
 
+        self.year = datetime.datetime.now().year
+
         self.proj_list = []
         self.general_search_var = StringVar()
         self.month_search_var = StringVar()
         self.year_search_var = StringVar()
+        self.year_search_var.set(self.year)
 
         self.scrolls_frame_lst = []
         self.month_list = [
             "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"
         ]
+        self.year_list = []
+        self.GetYears()
 
         self.scrolls = ScrollableFrame(self)
         self.scrolls.grid(row=0, column=0, sticky=NSEW)
 
         self.create_widgets()
+
+
+    def GetYears(self):
+        shop_years = f"Shop"
+
+        self.year_list = listdir(shop_years)
+
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
@@ -200,10 +214,10 @@ class ProjectBrowser(Frame):
         m_search_combo.grid(row=0, column=0, sticky=N + W)
         m_search_combo.bind("<<ComboboxSelected>>", self.MonthYearSearch)
 
-        m_search_combo = Combobox(month_search_lframe, textvariable=self.month_search_var, state="readonly",
-                                  values=self.month_list)
-        m_search_combo.grid(row=0, column=0, sticky=N + W)
-        m_search_combo.bind("<<ComboboxSelected>>", self.MonthYearSearch)
+        y_search_combo = Combobox(year_search_lframe, textvariable=self.year_search_var, state="readonly",
+                                  values=self.year_list)
+        y_search_combo.grid(row=0, column=0, sticky=N + W)
+        y_search_combo.bind("<<ComboboxSelected>>", self.YearMRS)
 
 
     def RefreshScroll(self, scrolls, sort=None, clear=None):
@@ -214,6 +228,7 @@ class ProjectBrowser(Frame):
         if clear:
             self.general_search_var.set("")
             self.month_search_var.set("")
+            self.year_search_var.set(self.year)
 
         for given_proj_frame in scrolls.scrollable_frame.winfo_children():
             given_proj_frame.destroy()
@@ -272,7 +287,10 @@ class ProjectBrowser(Frame):
         self.RefreshScroll(scrolls=self.scrolls, sort=typed_so_far)
 
 
-    def MonthYearSearch(self, event, year_q=False):
+    def YearMRS(self, event=None):
+        self.MonthYearSearch(year_q=True)
+
+    def MonthYearSearch(self, event=None, year_q=False):
         func_proj = self.proj_list
 
         export_project = []
@@ -285,7 +303,8 @@ class ProjectBrowser(Frame):
         else:
             slice_var = (2, 4)
 
-            the_search = self.year_search_var.get()
+            the_search = self.year_search_var.get()[2:]
+            print(the_search)
 
         for proj_index, given_project in enumerate(func_proj):
             str_slice = given_project[slice_var[0]:slice_var[1]]
@@ -355,27 +374,53 @@ class ProjLineClass(LabelFrame):
         super().__init__(scrolls)
         self.parent_flabel_pad = (5, 5)
 
+        self.project_number = proj
+
         self.config(padding=self.parent_flabel_pad)
 
-        proj_frame = LabelFrame(scrolls.scrollable_frame, text=proj, padding=self.parent_flabel_pad)
+        self.label_frame__frame = Frame(scrolls)
 
-        proj_var = StringVar(master=proj_frame, value=proj)
+        proj_label = Label(self.label_frame__frame, text=proj)
+        proj_label.grid(row=0, column=0)
+
+        open_master_butt = Button(self.label_frame__frame, text='Open Master', command=self.OpenMasterExcel)
+        open_master_butt.grid(row=0, column=1)
+
+        proj_frame = LabelFrame(scrolls.scrollable_frame, labelwidget=self.label_frame__frame, padding=self.parent_flabel_pad)
+
+        self.proj_var = StringVar(master=proj_frame, value=proj)
         proj_frame.grid(row=i, column=0)
         # proj_label = Label(proj_frame, text=proj)
         # proj_label.grid(row=0, column=0)
-        proj_open = Button(proj_frame, text=f'Open', command=lambda: OpenProject(proj_var.get()))
+        proj_open = Button(proj_frame, text=f'Open', command=lambda: OpenProject(self.proj_var.get()))
         proj_open.grid(row=0, column=1)
 
         create_doc_frame = LabelFrame(proj_frame, text='Create New Document', padding=self.parent_flabel_pad)
         create_doc_frame.grid(row=0, column=2)
-        line_string_var = StringVar(master=proj_frame)
+        self.line_string_var = StringVar(master=proj_frame)
+        self.line_string_var.set("Select Document to Create")
 
-        doc_choice = Combobox(create_doc_frame, state='readonly', textvariable=line_string_var, values=doc_list)
+        doc_choice = Combobox(create_doc_frame, state='readonly', textvariable=self.line_string_var, values=doc_list)
         doc_choice.config(width=30)
         doc_choice.grid(row=0, column=0)
         create_doc = Button(
             create_doc_frame,
             text='Create Doc',
-            command=lambda: CreateProjectDocument(proj_var.get(), line_string_var.get())
+            command=self.LineCreateProjDoc
         )
         create_doc.grid(row=0, column=1)
+
+
+    def OpenMasterExcel(self):
+        master_file_str = f"Projects\\{self.project_number}\\{self.project_number}-master.xlsx"
+
+        startfile(master_file_str)
+
+    def LineCreateProjDoc(self):
+        doc_chosen = self.line_string_var.get()
+
+        if doc_chosen == "Select Document to Create":
+            return
+
+        CreateProjectDocument(self.proj_var.get(), doc_chosen)
+

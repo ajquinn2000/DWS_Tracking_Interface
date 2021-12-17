@@ -1,15 +1,15 @@
 from tkinter import StringVar, messagebox, N, W, E, S
-from tkinter.ttk import Frame, Radiobutton, Label, Entry, Button, LabelFrame, Combobox
+from tkinter.ttk import Frame, Label, Entry, Button, LabelFrame, Combobox
 
 from datetime import datetime
 from shutil import copyfile
-from os import path, mkdir, remove
+from os import path, mkdir
 from csv import writer
 from pandas import read_csv
 
 from globalz import purchase_order_vars
 from appending_funcs import append_df_to_excel
-from general_funcs import GetVar, AddDataToExcel, IncrementGivenStat, LoadVendors
+from general_funcs import GetVar, AddDataToExcel, IncrementGivenStat, LoadVendors, XLCheckIfOpen, CSVCheckIfOpen
 from new_project import CreateNewProject
 
 global vendor_list
@@ -135,7 +135,7 @@ class PurchaseInputPage(Frame):
         )
         self.file_preview.grid(row=1, column=0, sticky=N+S+W)
         self.file_preview_var = StringVar()
-        self.file_preview_var.set('D2-4.0-XXXXX-XXXXX-XXXXX - Purchase Order.xlsx')
+        self.file_preview_var.set('D2-4-XXXXX-XXXXX-XXXXX - Purchase Order.xlsx')
         preview_label = Label(self.file_preview, textvariable=self.file_preview_var)
         preview_label.grid()
 
@@ -331,7 +331,7 @@ class PurchaseInputPage(Frame):
         if len(shrt_vendor) == 0:
             shrt_vendor = 'XXXXX'
 
-        shin_dig = f"D2-4.0-{shrt_vendor}-{project}-{descript} - Purchase Order.xlsx"
+        shin_dig = f"D2-4-{shrt_vendor}-{project}-{descript} - Purchase Order.xlsx"
         # print(shin_dig)
         self.file_preview_var.set(shin_dig)
 
@@ -360,7 +360,7 @@ class PurchaseInputPage(Frame):
 
         shrt_vendor = 'XXXXX'
 
-        shin_dig = f"D2-4.0-{shrt_vendor}-{project}-{descript} - Purchase Order.xlsx"
+        shin_dig = f"D2-4-{shrt_vendor}-{project}-{descript} - Purchase Order.xlsx"
         # print(shin_dig)
         self.file_preview_var.set(shin_dig)
 
@@ -400,34 +400,37 @@ class PurchaseInputPage(Frame):
 
         descript = f'{descript}{char}'
 
-        shin_dig = f"D2-4.0-{shrt_vendor}-{project}-{descript} - Purchase Order.xlsx"
+        shin_dig = f"D2-4-{shrt_vendor}-{project}-{descript} - Purchase Order.xlsx"
         # print(shin_dig)
         self.file_preview_var.set(shin_dig)
 
-    def UpdateFNP(self, key):
+    def UpdateFNP(self, key=None):
         descript = self.short_descript_var.get()
         project = self.proj_var.get()
         shrt_vendor = self.shrt_vendor_var.get()
+        # print(key)
+        if key.x != 0:
+            code = key.keycode
 
-        code = key.keycode
+            if 65 <= code <= 90 or 48 <= code <= 57 or 96 <= code <= 105:
+                char = key.char
+            elif code == 8:
+                project = project[:-1]
+                char = ''
+            else:
+                char = ''
 
-        if 65 <= code <= 90 or 48 <= code <= 57 or 96 <= code <= 105:
-            char = key.char
-        elif code == 8:
-            project = project[:-1]
-            char = ''
+            if len(project) == 0 and code == 8:
+                project = 'XXXXX'
         else:
             char = ''
-
-        if len(project) == 0 and code == 8:
-            project = 'XXXXX'
         if len(descript) == 0:
             descript = 'XXXXX'
         if len(shrt_vendor) == 0:
             shrt_vendor = 'XXXXX'
         project = f'{project}{char}'
 
-        shin_dig = f"D2-4.0-{shrt_vendor}-{project}-{descript} - Purchase Order.xlsx"
+        shin_dig = f"D2-4-{shrt_vendor}-{project}-{descript} - Purchase Order.xlsx"
 
         self.file_preview_var.set(shin_dig)
 
@@ -454,7 +457,7 @@ class PurchaseInputPage(Frame):
             shrt_vendor = 'XXXXX'
         shrt_vendor = f'{shrt_vendor}{char}'
 
-        shin_dig = f"D2-4.0-{shrt_vendor}-{project}-{descript} - Purchase Order.xlsx"
+        shin_dig = f"D2-4-{shrt_vendor}-{project}-{descript} - Purchase Order.xlsx"
 
         self.file_preview_var.set(shin_dig)
 
@@ -514,6 +517,8 @@ class PurchaseInputPage(Frame):
         if continue_q != True:
             return
 
+        shop_q = False
+        shop_year_folder = None
         if other_shtuff_lst[3] == "Shop":
             now = datetime.now()
             date_time = now.strftime('%m/%d/%Y - %H:%M:%S')
@@ -523,16 +528,15 @@ class PurchaseInputPage(Frame):
 
             shop_year_folder = f'Shop\\{year}'
             shop_month_folder = f'{shop_year_folder}\\{month}'
+            # special_shop_month = f'{shop_year_folder}'
             purchase_order_folder = f'{shop_month_folder}\\Purchase_Orders'
 
-            if not path.isdir(shop_year_folder):
-                print(f'HAPPY NEW YEAR!!!'
-                      f'\nMade {year} Shop folder')
-                mkdir(shop_year_folder)
 
-            if not path.isdir(shop_month_folder):
+            shop_q = True
 
-                pass
+            if not path.isdir(purchase_order_folder):
+                mkdir(purchase_order_folder)
+
 
 
 
@@ -543,20 +547,15 @@ class PurchaseInputPage(Frame):
             if not path.isdir(purchase_order_folder):
                 mkdir(purchase_order_folder)
 
-        dws_tot_count = self.IncreasePurchaseCount()
 
-        purchase_order_dest_loc = f'{purchase_order_folder}\\{dws_tot_count}{self.file_preview_var.get()}'
 
-        # special doc creation
-        special_path = f"Projects\\{other_shtuff_lst[3]}\\D2-4.0-{other_shtuff_lst[3]} - Purchase Order.xlsx"
+        dws_tot_count = self.IncreasePurchaseCount(shop_q)
 
-        # print(f'____________________ FILE {path.isfile(special_path)}\n{special_path}')
+        purchase_order_dest_loc = f'{purchase_order_folder}\\PO{dws_tot_count} {self.file_preview_var.get()}'
 
-        if path.isfile(special_path):
-            copyfile(special_path, purchase_order_dest_loc)
-            remove(special_path)
-        else:
-            copyfile(self.purchase_order_loc, purchase_order_dest_loc)
+
+
+        copyfile(self.purchase_order_loc, purchase_order_dest_loc)
 
         AddDataToExcel(
             excel_loc=purchase_order_dest_loc,
@@ -585,7 +584,7 @@ class PurchaseInputPage(Frame):
         )
 
 
-        self.AddToMasterExcel(item_quant_amnt_lst, other_shtuff_lst, dws_tot_count)
+        self.AddToMasterExcel(item_quant_amnt_lst, other_shtuff_lst, dws_tot_count, shop_loc=shop_year_folder)
 
         for line in self.line_array:
             line.Delete()
@@ -606,7 +605,7 @@ class PurchaseInputPage(Frame):
         self.quote_id_var.set('')
         self.expected_del_var.set('')
         self.vendor_loc_var.set('')
-        self.file_preview_var.set('D2-4.0-XXXXX-XXXXX-XXXXX - Purchase Order.xlsx')
+        self.file_preview_var.set('D2-4-XXXXX-XXXXX-XXXXX - Purchase Order.xlsx')
 
         if self.top_level != None:
             self.destroy()
@@ -615,6 +614,61 @@ class PurchaseInputPage(Frame):
 
 
     def IsEmpty(self, item_quant_amnt_lst, other_shtuff_lst):
+        now_now = datetime.now()
+        year = now_now.year
+        month = now_now.strftime('%B')
+
+        year_folder_path = f'Shop\\{year}'
+        folder_path = f"{year_folder_path}\\{month}"
+
+        # checking if that year of shop purchases exists
+        if not path.isdir(year_folder_path) or not path.isdir(folder_path):
+            CreateNewProject(shop_q=True)
+
+        project = other_shtuff_lst[3]
+        shop_q__in_empty = False
+        if project != "Shop":
+            not_shop_folder_path = f"Projects\\{project}"
+            project_master_excel = f'{not_shop_folder_path}\\{project}-master.xlsx'
+            src_folder = f'{not_shop_folder_path}\\!src'
+            project_purchase_csv = f'{src_folder}\\{project}p.csv'
+            project_log_csv = f'{src_folder}\\{project}p_log.csv'
+
+            message_file_open = f"{project_master_excel} is open. Make sure you close it before you begin."
+            master_open_q = XLCheckIfOpen(file=project_master_excel, title="Close File", message=message_file_open)
+
+            message_file_open1 = f"{project_purchase_csv} is open. Make sure you close it before you begin."
+            p_open = CSVCheckIfOpen(file=project_purchase_csv, title="Close File", message=message_file_open1)
+
+            message_file_open2 = f"{project_log_csv} is open. Make sure you close it before you begin."
+            p_log_open = CSVCheckIfOpen(file=project_log_csv, title="Close File", message=message_file_open2)
+
+        else:
+
+            project_pathxlsx = f'{folder_path}\\{month}-master.xlsx'
+            src_folder = f'{folder_path}\\!src'
+            project_purchase_csv = f'{src_folder}\\{month}p.csv'
+            project_log_csv = f'{src_folder}\\{month}p_log.csv'
+
+
+
+
+
+
+            message_file_open = f"{project_pathxlsx} is open. Make sure you close it before you begin."
+            master_open_q = XLCheckIfOpen(file=project_pathxlsx, title="Close File", message=message_file_open)
+
+            message_file_open1 = f"{project_purchase_csv} is open. Make sure you close it before you begin."
+            p_open = CSVCheckIfOpen(file=project_purchase_csv, title="Close File", message=message_file_open1)
+
+            message_file_open2 = f"{project_log_csv} is open. Make sure you close it before you begin."
+            p_log_open = CSVCheckIfOpen(file=project_log_csv, title="Close File", message=message_file_open2)
+
+        #
+        if master_open_q or p_open or p_log_open:
+            return True
+
+
         list_1_str_stuffs = ['Item', 'Quantitty', 'Amount']
         list_2_str_stuffs = [
             'Date',
@@ -663,7 +717,7 @@ class PurchaseInputPage(Frame):
             elif input_info == '':
                 skip_q = messagebox.askokcancel(title=f'Possibly Okay:Empty {list_2_str_stuffs[i]}',
                                        message=f'Missing {list_2_str_stuffs[i]}\n'
-                                               f'Should that be missing dudette??')
+                                               f'Just letting you know that it is empty')
                 if skip_q != True:
                     return True
 
@@ -674,46 +728,48 @@ class PurchaseInputPage(Frame):
                                    message=f'A purchase order already exists with that name.\n'
                                            f'hmmmmmmm hope that is not bad news...')
             return True
+        if project != "Shop":
+            if not path.isdir(f'Projects\\{project}'):
+                messagebox.showwarning(title=f'BRUH............',
+                                       message=f'{other_shtuff_lst[3]} does not exist dude\n'
+                                               f'So either check your project number or make a new one\n'
+                                               f'also, you suck')
 
-        if not path.isdir(f'Projects\\{other_shtuff_lst[3]}'):
-            messagebox.showwarning(title=f'BRUH............',
-                                   message=f'{other_shtuff_lst[3]} does not exist dude\n'
-                                           f'So either check your project number or make a new one\n'
-                                           f'also, you suck')
-
-            return True
+                return True
 
         return False
 
 
-    def IncreasePurchaseCount(self):
-        proj_stats_loc = f'Projects\\{self.proj_var.get()}\\!src\\stats.txt'
-        if not path.isdir(f'Projects\\{self.proj_var.get()}\\!src'):
-            print(f'<{__name__}> Sorry bruv, could not find: Projects\\{self.proj_var.get()}\\!src')
-            proj_stats_loc = f'Projects\\{self.proj_var.get()}\\src\\stats.txt'
-
-        proj_stats = GetVar(proj_stats_loc, True)
+    def IncreasePurchaseCount(self, shop_q):
         purchase_order_var = 'Purchase_Order_Count'
+        if not shop_q:
 
-        IncrementGivenStat(
-            stat_file=proj_stats_loc,
-            stat_str=purchase_order_var,
-            increment=1,
-            comment_lines=proj_stats[0],
-            working_vars=proj_stats[1],
-            var_vars=proj_stats[2]
-        )
+            proj_stats_loc = f'Projects\\{self.proj_var.get()}\\!src\\stats.txt'
+            if not path.isdir(f'Projects\\{self.proj_var.get()}\\!src'):
+                print(f'<{__name__}> Sorry bruv, could not find: Projects\\{self.proj_var.get()}\\!src')
+                proj_stats_loc = f'Projects\\{self.proj_var.get()}\\src\\stats.txt'
+
+            proj_stats = GetVar(proj_stats_loc, True)
+
+
+            IncrementGivenStat(
+                stat_file=proj_stats_loc,
+                stat_str=purchase_order_var,
+                increment=1,
+                comment_lines=proj_stats[0],
+                working_vars=proj_stats[1],
+                var_vars=proj_stats[2]
+            )
 
         date = self.GetCurrentDate(slash=False)
         year = datetime.now().year
+        month = datetime.now().strftime("%B")
 
         dws_stats_loc = f'Shop\\{year}'
-        shop_stat_loc = f'\\!src\\stats.txt'
-        if not path.isdir(f'Shop\\{year}\\!src'):
-            shop_stat_loc = f'\\src\\stats.txt'
+        shop_stat_loc = f'\\{month}\\!src\\stats.txt'
 
-        if not path.isdir(dws_stats_loc):
-            CreateNewProject(shop_q=True)
+        # if not path.isdir(dws_stats_loc):
+        #     CreateNewProject(shop_q=True)
 
         shop_stats_loc = f'{dws_stats_loc}{shop_stat_loc}'
         shop_stats = GetVar(shop_stats_loc, True)
@@ -731,17 +787,25 @@ class PurchaseInputPage(Frame):
         return f'{date}{dws_total_purchase}'
 
 
-    def AddToMasterExcel(self, item_quant_amnt_lst: list, other_shtuff_lst, dws_tot_count):
+    def AddToMasterExcel(self, item_quant_amnt_lst: list, other_shtuff_lst, dws_tot_count, shop_loc=None):
         project = other_shtuff_lst[3]
 
-        project_purchase_csv = f'Projects\\{project}\\!src\\{project}p.csv'
-        if not path.isdir(f'Projects\\{project}\\!src'):
-            project_purchase_csv = f'Projects\\{project}\\src\\{project}p.csv'
+        projects_folder = "Projects"
 
-        project_log_csv = f'Projects\\{project}\\!src\\{project}p_log.csv'
+        if shop_loc != None:
+            projects_folder = shop_loc
+
+            now_now = datetime.now()
+            # equals month
+            project = now_now.strftime('%B')
 
 
-        project_master_excel = f'Projects\\{project}\\{project}-master.xlsx'
+        project_purchase_csv = f'{projects_folder}\\{project}\\!src\\{project}p.csv'
+
+        project_log_csv = f'{projects_folder}\\{project}\\!src\\{project}p_log.csv'
+
+
+        project_master_excel = f'{projects_folder}\\{project}\\{project}-master.xlsx'
 
         now_now = datetime.now()
         year = now_now.year
@@ -831,8 +895,6 @@ class PurchaseInputPage(Frame):
 
         # appending csv to master excel
         # code for handling legacy master files
-        if not path.isfile(project_master_excel):
-            project_master_excel = f'Projects\\{project}\\{project}.xlsx'
         df = read_csv(project_purchase_csv)
         append_df_to_excel(
             project_master_excel,
@@ -840,7 +902,8 @@ class PurchaseInputPage(Frame):
             sheet_name=f'{project}_purchases',
             startrow=2,
             startcol=1,
-            index=False
+            index=False,
+            no_pic=True
         )
 
 

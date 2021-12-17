@@ -1,5 +1,5 @@
 from tkinter import StringVar, BooleanVar, IntVar, messagebox, N, W, E, S, NW, Text, END, Checkbutton
-from tkinter.ttk import Frame, Radiobutton, Label, Entry, Button, Combobox, LabelFrame
+from tkinter.ttk import Frame, Label, Entry, Button, Combobox, LabelFrame
 from os import startfile, path
 from shutil import copyfile
 
@@ -195,7 +195,7 @@ class PackingSlipPage(Frame):
         if self.CheckIfEmpty(item_lst, qty_list, ship_to, project_got):
             return
 
-        first_exit_q = CreateProjectDocument(project_got, 'D2-7.0 - Packing Slip')
+        first_exit_q = CreateProjectDocument(project_got, 'D2-7 - Packing Slip')
 
         if igs_q:
             submit_igs_junk = IGS_Generate_Update_Logs(
@@ -211,7 +211,7 @@ class PackingSlipPage(Frame):
                 return
 
         if not igs_q:
-            packing_slip_loc = f'Projects\\{project_got}\\D2-7.0-{project_got} - Packing Slip.xlsx'
+            packing_slip_loc = f'Projects\\{project_got}\\D2-7-{project_got} - Packing Slip.xlsx'
 
             AddDataToExcel(
                 excel_loc=packing_slip_loc,

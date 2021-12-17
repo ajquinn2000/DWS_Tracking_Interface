@@ -84,6 +84,7 @@ def append_df_to_excel(
         fmt_datetime: str = "yyyy-mm-dd hh:mm",
         truncate_sheet: bool = False,
         storage_options: Optional[dict] = None,
+        no_pic=False,
         **to_excel_kwargs
 ) -> None:
     """
@@ -92,6 +93,7 @@ def append_df_to_excel(
     If [filename] doesn't exist, then this function will create it.
 
     @param filename: File path or existing ExcelWriter
+                     (Example: '/path/to/file.xlsx')
                      (Example: '/path/to/file.xlsx')
     @param df: DataFrame to save to workbook
     @param sheet_name: Name of sheet which will contain DataFrame.
@@ -221,7 +223,7 @@ def append_df_to_excel(
             with_style=True
         )
         ws = wb.worksheets[0]
-        if len(ws._images) != 1:
+        if len(ws._images) != 1 and not no_pic:
             logo_png_loc = general_file_loc[0] + "\\" + general_file_loc[4]
             img = openpyxl.drawing.image.Image(logo_png_loc)
 

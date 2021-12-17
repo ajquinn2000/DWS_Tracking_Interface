@@ -1,4 +1,6 @@
 from os import path, getcwd, chdir
+from openpyxl import load_workbook
+from tkinter import messagebox
 
 
 from appending_funcs import append_df_to_excel
@@ -191,8 +193,32 @@ def LoadVendors(col_count=7):
     return vendor_list
 
 
-def CheckIfOpen(file):
-    pass
+def XLCheckIfOpen(file, title, message):
+    if not path.isfile(file):
+        return
+    try:
+        wb = load_workbook(file)
+
+        wb.save(file)
+
+        return False
+    except:
+        messagebox.showwarning(title=title, message=message)
+
+        return True
+
+
+def CSVCheckIfOpen(file, title, message):
+    if not path.isfile(file):
+        return
+    try:
+        with open(file, "a+", newline='') as csvfile:
+            pass
+        return False
+    except:
+        messagebox.showwarning(title=title, message=message)
+
+        return True
 
 
 
