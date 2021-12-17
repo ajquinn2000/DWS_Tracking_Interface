@@ -66,7 +66,7 @@ def CreateNewProject(shop_q=False):
 
     # print(f'Yes: {yes}')
 
-    if yes is None:
+    if yes is None or yes is False:
         return
 
     elif not shop_q:
