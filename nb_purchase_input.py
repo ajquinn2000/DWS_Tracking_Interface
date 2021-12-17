@@ -376,7 +376,7 @@ class PurchaseInputPage(Frame):
         if slash:
             return now.strftime('%m/%d/%Y')
         if not slash:
-            return now.strftime('%m%d%Y')
+            return now.strftime('%m%y')
 
     def UpdateFND(self, key):
         descript = self.short_descript_var.get()
@@ -559,7 +559,7 @@ class PurchaseInputPage(Frame):
 
         final_file_name = f'PO{dws_tot_count} {self.file_preview_var.get()}'
 
-        general_po_loc = f"{general_year_po_loc}\\{final_file_name}"
+        general_po_loc = f"{general_year_ps_loc}\\{final_file_name}"
 
         purchase_order_dest_loc = f'{purchase_order_folder}\\{final_file_name}'
 

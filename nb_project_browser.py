@@ -159,6 +159,9 @@ class ProjectBrowser(Frame):
         super().__init__(master)
         self.grid()
 
+        self.parent_flabel_pad = (5, 5)
+        self.butt_w = 15
+
         self.year = datetime.datetime.now().year
 
         self.proj_list = []
@@ -188,25 +191,34 @@ class ProjectBrowser(Frame):
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
-        butt_lframe = LabelFrame(self, text="Reset and Search")
-        butt_lframe.grid(row=0, column=1, sticky=N + S + E + W)
+        option_menu = LabelFrame(self, text="Controls and Short-Cuts", padding=self.parent_flabel_pad)
+        option_menu.grid(row=0, column=1, sticky=N + S + E + W)
 
-        project_search_lframe = LabelFrame(butt_lframe, text="Project Search")
+        butt_lframe = LabelFrame(option_menu, text="Reset and Search", padding=self.parent_flabel_pad)
+        butt_lframe.grid(row=0, column=0, sticky=N + S + E + W)
+
+        qo_lframe = LabelFrame(option_menu, text="Quick Open", padding=self.parent_flabel_pad)
+        qo_lframe.grid(row=1, column=0, sticky=N + S + E + W)
+
+        project_search_lframe = LabelFrame(butt_lframe, text="Project Search", padding=self.parent_flabel_pad)
         project_search_lframe.grid(row=1, column=0, sticky=N + S + E + W)
 
-        month_search_lframe = LabelFrame(butt_lframe, text="Month Search")
+        month_search_lframe = LabelFrame(butt_lframe, text="Month Search", padding=self.parent_flabel_pad)
         month_search_lframe.grid(row=2, column=0, sticky=N + S + E + W)
 
-        year_search_lframe = LabelFrame(butt_lframe, text="Year Search")
+        year_search_lframe = LabelFrame(butt_lframe, text="Year Search", padding=self.parent_flabel_pad)
         year_search_lframe.grid(row=3, column=0, sticky=N + S + E + W)
 
         refresh_butt = Button(butt_lframe, text='⟳', command=lambda: self.RefreshScroll(self.scrolls, clear=True), width=3)
         refresh_butt.grid(row=0, column=0, sticky=N + W)
 
+
+        self.CreateShortcuts(qo_lframe)
+
         self.RefreshScroll(self.scrolls)
 
         search_combo = Combobox(project_search_lframe, textvariable=self.general_search_var, values=self.proj_list)
-        search_combo.grid(row=0, column=0, sticky=N + W)
+        search_combo.grid(row=0, column=0, rowspan=2, sticky=N + W)
         search_combo.bind("<Key>", lambda key: self.SearchFunc(key))
         search_combo.bind("<<ComboboxSelected>>", self.SearchFunc)
 
@@ -218,6 +230,34 @@ class ProjectBrowser(Frame):
                                   values=self.year_list)
         y_search_combo.grid(row=0, column=0, sticky=N + W)
         y_search_combo.bind("<<ComboboxSelected>>", self.YearMRS)
+
+    def CreateShortcuts(self, qo_lframe):
+        projects = Button(qo_lframe, text="Open Projects",
+                        command=lambda: self.OpenShort(da_path="Projects"), width=self.butt_w)
+        projects.grid(row=0, column=0)
+
+        shop_sc = Button(qo_lframe, text="Open Shop",
+                          command=lambda: self.OpenShort(da_path="Shop"), width=self.butt_w)
+        shop_sc.grid(row=1, column=0)
+
+        yearly_po = Button(qo_lframe, text="Yearly PO",
+                         command=lambda: self.OpenShort(da_path="Finance\\Yearly_Purchase_Orders"), width=self.butt_w)
+        yearly_po.grid(row=2, column=0)
+
+        yearly_ps = Button(qo_lframe, text="Yearly PS",
+                           command=lambda: self.OpenShort(da_path="Finance\\Yearly_Packing_Slips"), width=self.butt_w)
+        yearly_ps.grid(row=3, column=0)
+
+        cc_purch = Button(qo_lframe, text="CC_Purchases",
+                           command=lambda: self.OpenShort(da_path="Finance\\Monthly_Credit_Card_Purchases"), width=self.butt_w)
+        cc_purch.grid(row=4, column=0)
+
+        igs_inv = Button(qo_lframe, text="Open IGS Inv", command=lambda: self.OpenShort(da_path="Customers\IGS\Inventory"), width=self.butt_w)
+        igs_inv.grid(row=5, column=0)
+
+
+    def OpenShort(self, event=None, da_path=None):
+        startfile(da_path)
 
 
     def RefreshScroll(self, scrolls, sort=None, clear=None):
