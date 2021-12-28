@@ -4,7 +4,7 @@ from tkinter import messagebox
 from os import path
 
 
-from new_project import CreateNewProject
+from new_project import CreateNewProjectnAskDesc
 from general_funcs import GoToTracking
 from nb_packing_slip import PackingSlipPage
 from nb_purchase_input import PurchaseInputPage
@@ -78,7 +78,7 @@ def main():
     vendor_menu = Menu(menubar, tearoff=0)
     worker_menu = Menu(menubar, tearoff=0)
 
-    project_menu.add_command(label="New Project", command=CreateNewProject)
+    project_menu.add_command(label="New Project", command=CreateNewProjectnAskDesc)
     project_menu.add_command(label="Open Project", command=OpenProject)
     menubar.add_cascade(label="Projects", menu=project_menu)
 

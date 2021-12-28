@@ -1,5 +1,5 @@
 import datetime
-from tkinter import StringVar, Canvas, messagebox, N, W, E, S, NSEW, Tk, Scrollbar, Toplevel
+from tkinter import StringVar, Canvas, messagebox, N, W, E, S, NSEW, Tk, Scrollbar, Toplevel, Text
 from tkinter.ttk import Frame, Label, Entry, Button, LabelFrame, Combobox
 
 from os import startfile, listdir, path
@@ -9,6 +9,18 @@ from nb_purchase_input import PurchaseInputPage
 from nb_packing_slip import PackingSlipPage
 from general_funcs import AddDataToExcel
 from new_project import CreateNewProject
+
+
+def GetTag(proj):
+    desktop_ini_loc = f"Projects\\{proj}\\desktop.ini"
+
+    with open(desktop_ini_loc, 'r') as write:
+        lines_from_ini = write.readlines()
+
+    secnd_line = lines_from_ini[1]
+    secnd_ln_split = secnd_line.split(",")[1]
+
+    return secnd_ln_split
 
 
 def OpenProject(project=None, ):
@@ -60,9 +72,9 @@ def CreateProjectDocument(project, doc):
         destination = f'Projects\\{project}\\{split_doc[0]}-{project} - {split_doc[1]}.xlsx'
 
         if path.exists(destination):
-            messagebox.showinfo('Bruv, That Already Exists', 'That File Already Exists.\n\n'
-                                                             f'If you want to create another version, change name of '
-                                                             f'{destination} first...')
+            messagebox.showinfo('File Already Exists', 'That File Already Exists.\n\n'
+                                                             f'If you want to create another version, change name of:\n'
+                                                             f'{destination}')
             return
 
         if doc == 'D2-7 - Packing Slip':
@@ -98,9 +110,9 @@ def CreateProjectDocument(project, doc):
         messagebox.showinfo(f"Doc: {doc} Created", f"Doc: {doc} created for Project: {project}")
 
     else:
-        create_new_proj = messagebox.askquestion(
-            f'{project} Does Not Exist, bruv',
-            f'{project} does not exist. Would you like to create that project, homie?'
+        create_new_proj = messagebox.showerror(
+            f'{project} Does Not Exist',
+            f'{project} does not exist. Check that you have the correct project number and that specific project exists?'
         )
         if create_new_proj:
             project = CreateNewProject()
@@ -134,7 +146,7 @@ class ScrollableFrame(Frame):
     def __init__(self, container):
         super().__init__(container)
         self.config(height=500, width=600)
-        canvas = Canvas(self, height=500, width=500)
+        canvas = Canvas(self, height=500, width=570)
         scrollbar = Scrollbar(self, orient="vertical", command=canvas.yview)
         self.scrollable_frame = Frame(canvas)
 
@@ -296,9 +308,13 @@ class ProjectBrowser(Frame):
         elif type(sort) == list:
             func_proj_list = sort
 
+
         for i, proj in enumerate(func_proj_list):
             print(f"<{__name__}> Creating Proj: {proj} on line {i}")
-            ProjLineClass(scrolls, doc_list, proj, i)
+
+            proj_descrptsdad = GetTag(proj)
+
+            ProjLineClass(scrolls, doc_list, proj, proj_descrptsdad, i)
 
 
             # doc_create_selector = Frame()
@@ -377,16 +393,18 @@ def CreateDocCommand():
     proj_list = listdir('Projects')
     # print(f'Here {proj_list}')
 
-    doc_label = LabelFrame(creat_doc_win, text='|Choose Doc|', padding=parent_flabel_pad)
+    doc_label = LabelFrame(creat_doc_win, text='Choose Doc', padding=parent_flabel_pad)
     doc_label.grid(row=0, column=0)
     doc_var = StringVar()
+    doc_var.set("Select Document")
     doc_choice = Combobox(doc_label, state="readonly", textvariable=doc_var, values=doc_list)
     doc_choice.config(width=30)
     doc_choice.grid(row=1, column=0)
 
-    proj_label = LabelFrame(creat_doc_win, text='|Choose Project|', padding=parent_flabel_pad)
+    proj_label = LabelFrame(creat_doc_win, text='Choose Project', padding=parent_flabel_pad)
     proj_label.grid(row=2, column=0)
     proj_var = StringVar()
+    proj_var.set("Select Project")
     proj_choice = Combobox(proj_label, state="readonly", textvariable=proj_var, values=proj_list)
     proj_choice.config(width=30)
     proj_choice.grid(row=3, column=0)
@@ -395,10 +413,10 @@ def CreateDocCommand():
         project = proj_var.get()
         doc = doc_var.get()
         if project == 'Select Project':
-            messagebox.showwarning("SMH...Error", 'Come on man... Choose a project')
+            messagebox.showwarning("Error", 'A project must be selected. Choose a project.')
             return
-        if doc == 'Choose Project':
-            messagebox.showwarning('Bruv...Error', "You couldn't pic a document? It is soooo ez pz")
+        if doc == 'Select Document':
+            messagebox.showwarning('Error', "A document must be selected. Choose a document")
             return
         CreateProjectDocument(project, doc)
         creat_doc_win.destroy()
@@ -412,35 +430,59 @@ def CreateDocCommand():
 
 
 class ProjLineClass(LabelFrame):
-    def __init__(self, scrolls, doc_list, proj, i):
+    def __init__(self, scrolls, doc_list, proj, descript, i):
         super().__init__(scrolls)
         self.parent_flabel_pad = (5, 5)
+        self.wid = 5
+        self.l_w = 26
 
         self.project_number = proj
 
+
         self.config(padding=self.parent_flabel_pad)
 
-        self.label_frame__frame = Frame(scrolls)
+        self.label_frame__frame = Frame(scrolls.scrollable_frame)
 
-        proj_label = Label(self.label_frame__frame, text=proj)
+        proj_label = Label(self.label_frame__frame, text=self.project_number, font=('lucida', 15))
         proj_label.grid(row=0, column=0)
 
-        open_master_butt = Button(self.label_frame__frame, text='Open Master', command=self.OpenMasterExcel)
+        open_master_butt = Button(self.label_frame__frame, text='Open Master Excel', command=self.OpenMasterExcel)
         open_master_butt.grid(row=0, column=1)
 
-        proj_frame = LabelFrame(scrolls.scrollable_frame, labelwidget=self.label_frame__frame, padding=self.parent_flabel_pad)
+        self.proj_frame = LabelFrame(scrolls.scrollable_frame, labelwidget=self.label_frame__frame, padding=self.parent_flabel_pad)
 
-        self.proj_var = StringVar(master=proj_frame, value=proj)
-        proj_frame.grid(row=i, column=0)
+        self.proj_var = StringVar(master=self.proj_frame, value=proj)
+        self.project_descp_var = StringVar(master=self.proj_frame, value=descript)
+
+        self.proj_frame.grid(row=i, column=0)
         # proj_label = Label(proj_frame, text=proj)
         # proj_label.grid(row=0, column=0)
-        proj_open = Button(proj_frame, text=f'Open', command=lambda: OpenProject(self.proj_var.get()))
+        proj_open = Button(self.proj_frame, text=f' Open\nProject', command=lambda: OpenProject(self.proj_var.get()))
         proj_open.grid(row=0, column=1)
 
-        create_doc_frame = LabelFrame(proj_frame, text='Create New Document', padding=self.parent_flabel_pad)
-        create_doc_frame.grid(row=0, column=2)
-        self.line_string_var = StringVar(master=proj_frame)
+        create_doc_frame = LabelFrame(self.proj_frame, text='Create New Document', padding=self.parent_flabel_pad)
+        create_doc_frame.grid(row=0, column=2, sticky=N + S)
+        self.line_string_var = StringVar(master=self.proj_frame)
         self.line_string_var.set("Select Document to Create")
+
+        self.descript_labelframe = Frame(scrolls.scrollable_frame)
+
+        descript_label = Label(self.descript_labelframe, text="Project Details")
+        descript_label.grid(row=0, column=0)
+
+        self.descript_edit_butt = Button(self.descript_labelframe, text="Edit", command=self.EditDescript, width=self.wid)
+        self.descript_edit_butt.grid(row=0, column=1)
+
+        self.descrip_lframe = LabelFrame(self.proj_frame, labelwidget=self.descript_labelframe, padding=self.parent_flabel_pad)
+        self.descrip_lframe.grid(row=0, column=3, sticky=N + S)
+
+        self.escp_label = Label(
+            self.descrip_lframe,
+            textvariable=self.project_descp_var,
+            width=self.l_w,
+            wraplength=self.l_w * 6,
+        )
+        self.escp_label.grid(row=0, column=0)
 
         doc_choice = Combobox(create_doc_frame, state='readonly', textvariable=self.line_string_var, values=doc_list)
         doc_choice.config(width=30)
@@ -465,4 +507,48 @@ class ProjLineClass(LabelFrame):
             return
 
         CreateProjectDocument(self.proj_var.get(), doc_chosen)
+
+    def EditDescript(self):
+        self.descript_edit_butt.destroy()
+        self.escp_label.destroy()
+
+        self.descript_edit_butt = Button(self.descript_labelframe, text="Confirm", command=self.ConfirmEditDescript, width=8)
+        self.descript_edit_butt.grid(row=0, column=1)
+
+        self.escp_label = Text(
+            self.descrip_lframe,
+            width=self.l_w-7,
+            height=3
+        )
+        self.escp_label.grid(row=0, column=0)
+        self.escp_label.insert("1.0", self.project_descp_var.get())
+
+    def ConfirmEditDescript(self):
+        new_d = self.escp_label.get("1.0", "end")
+        new_d = new_d[:-1]
+
+        ini_loc = f"Projects\\{self.proj_var.get()}\\desktop.ini"
+        input_lines = ["[{F29F85E0-4FF9-1068-AB91-08002B27B3D9}]\n", f"Prop5=31,{new_d}"]
+
+        with open(ini_loc, "w") as ini_file:
+            ini_file.writelines(input_lines)
+
+        self.project_descp_var.set(new_d)
+
+        self.ReloadDescript(add_edit_but=True)
+
+    def ReloadDescript(self, add_edit_but=False):
+        self.escp_label.destroy()
+        self.descript_edit_butt.destroy()
+
+        self.descript_edit_butt = Button(self.descript_labelframe, text="Edit", command=self.EditDescript, width=self.wid)
+        self.descript_edit_butt.grid(row=0, column=1)
+
+        self.escp_label = Label(
+            self.descrip_lframe,
+            textvariable=self.project_descp_var,
+            width=self.l_w,
+            wraplength=self.l_w*6,
+        )
+        self.escp_label.grid(row=0, column=0)
 

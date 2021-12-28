@@ -259,27 +259,27 @@ class PackingSlipPage(Frame):
         # print(f'Quantity {qty_list}, item_lst {item_lst}')
         for j, item, qty in zip(range(0, len(item_lst)), item_lst, qty_list):
             if item == '':
-                messagebox.showwarning(title='Nuh uh, my dude:Empty Item', message=f'Missing item in line {j + 1}, my man')
+                messagebox.showwarning(title='Empty Item', message=f'Missing item in line {j + 1}, my man')
                 return True
 
             if str(qty) == '':
-                messagebox.showwarning(title='Sorry Brosive: Empty Quantitty', message=f'Missing quantity in line {j + 1}, Slick')
+                messagebox.showwarning(title='Empty Quantitty', message=f'Missing quantity in line {j + 1}, Slick')
                 return True
             elif not qty.isdigit():
-                messagebox.showwarning(title='My hommie... Incorrect Quantitty', message=f'Must be a number on line {j + 1}\n you know what a number is???')
+                messagebox.showwarning(title='Incorrect Quantitty', message=f'Must be a number on line {j + 1}')
                 return True
 
         if ship_to == '\n':
             messagebox.showwarning(
-                title='REALLY????? Empty Shipping Location',
-                message=f"Missing shipping information... You don't know where this is going? SMH"
+                title='Empty Shipping Location',
+                message=f"Missing shipping information."
             )
             return True
 
         if project_got == '':
             messagebox.showwarning(
-                title='Empty Quantitty... heh titty ;)',
-                message=f'Missing project number, my man. Make sure you check closer next time'
+                title='Empty Project Number',
+                message=f'Missing project number.'
             )
             return True
 
